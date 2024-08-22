@@ -52,7 +52,7 @@ class _ViewAllScreenState extends State<ViewAllScreen> {
           ),
         ),
         body: Column(
-          crossAxisAlignment:CrossAxisAlignment.end
+          crossAxisAlignment:CrossAxisAlignment.end,
           children: [
             ElevatedButton(
                 onPressed: () {
