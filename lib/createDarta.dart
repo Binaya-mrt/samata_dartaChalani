@@ -82,6 +82,10 @@ class _CreateDartaScreenState extends State<CreateDartaScreen> {
       );
 
       Navigator.of(context).pop();
+    }else{
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Please fill in all the details')),
+      );
     }
   }
 
@@ -157,7 +161,7 @@ class _CreateDartaScreenState extends State<CreateDartaScreen> {
                           height: 150,
                           width: 150,
                         )
-                  : Text('No file selected.'),
+                  : Text('No file selected.',style: TextStyle(color: Colors.red)),
               SizedBox(height: 20),
               ElevatedButton(
                 onPressed: _pickFile,

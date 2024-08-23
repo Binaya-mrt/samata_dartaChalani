@@ -30,37 +30,57 @@ class _ViewAllScreenState extends State<ViewAllScreen> {
     '2081/82'
   ]; // Replace with your fiscal years
 
-  @override
-  Widget build(BuildContext context) {
-    final dartaBox = Hive.box<Darta>('darta');
-    final chalaniBox = Hive.box<Chalani>('chalani');
+ @override
+Widget build(BuildContext context) {
+  final dartaBox = Hive.box<Darta>('darta');
+  final chalaniBox = Hive.box<Chalani>('chalani');
 
-    List<Darta> filteredDartaList = _filterDarta(dartaBox.values.toList());
-    List<Chalani> filteredChalaniList =
-        _filterChalani(chalaniBox.values.toList());
+  List<Darta> filteredDartaList = _filterDarta(dartaBox.values.toList());
+  List<Chalani> filteredChalaniList = _filterChalani(chalaniBox.values.toList());
 
-    return DefaultTabController(
-      length: 2,
-      child: Scaffold(
-        appBar: AppBar(
-          title: Text('View All Darta Chalanis'),
-          bottom: TabBar(
-            tabs: [
-              Tab(text: 'Darta'),
-              Tab(text: 'Chalani'),
-            ],
+  return DefaultTabController(
+    length: 2,
+    child: Scaffold(
+      appBar: AppBar(
+        title: Text(
+          'View All Darta Chalanis',
+          style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+        ),
+        bottom: TabBar(
+          tabs: [
+            Tab(text: 'Darta'),
+            Tab(text: 'Chalani'),
+          ],
+          indicatorColor: Colors.black87,
+          labelColor: Colors.black,
+          // unselectedLabelColor: Color.fromARGB(0, 3, 20, 247),
+        ),
+      ),
+      body: Container(
+        padding: EdgeInsets.all(16.0),
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [Colors.blue, Color.fromARGB(255, 57, 143, 165)],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
           ),
         ),
-        body: Column(
-          crossAxisAlignment:CrossAxisAlignment.end,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.end,
           children: [
             ElevatedButton(
-                onPressed: () {
-                  ExportService().exportToExcel(context);
-                },
-                child: Text('Export to excel')),
-            SizedBox(
-              height: 500,
+              onPressed: () {
+                ExportService().exportToExcel(context);
+              },
+              style: ElevatedButton.styleFrom(
+                foregroundColor: Colors.black, backgroundColor: Colors.amber, // Text color
+                padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                textStyle: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              ),
+              child: Text('Export to Excel'),
+            ),
+            SizedBox(height: 20), // Add some spacing
+            Expanded(
               child: TabBarView(
                 children: [
                   _buildDartaTab(filteredDartaList),
@@ -70,9 +90,11 @@ class _ViewAllScreenState extends State<ViewAllScreen> {
             ),
           ],
         ),
+        
       ),
-    );
-  }
+    ),
+  );
+}
 
   Widget _buildDartaTab(List<Darta> dartaList) {
     return Padding(
@@ -208,9 +230,11 @@ class _ViewAllScreenState extends State<ViewAllScreen> {
         TextField(
           decoration: InputDecoration(
             labelText: 'Incoming Institution Name',
+            
             border: OutlineInputBorder(),
             contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
           ),
+
           onChanged: (value) {
             setState(() {
               _incomingInstitutionFilter = value;
@@ -227,7 +251,7 @@ class _ViewAllScreenState extends State<ViewAllScreen> {
             padding: const EdgeInsets.symmetric(vertical: 8.0),
             child: Text(
               'Selected Range: ${_selectedDateRange!.start.toNepaliDateTime()} - ${_selectedDateRange!.end.toNepaliDateTime()}',
-              style: TextStyle(color: Colors.blueGrey),
+              style: TextStyle(color: const Color.fromARGB(255, 0, 0, 0)),
             ),
           ),
         SizedBox(height: 16),
