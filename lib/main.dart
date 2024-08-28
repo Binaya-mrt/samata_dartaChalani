@@ -5,10 +5,10 @@ import 'package:hive/hive.dart';
 import 'package:samata_dartachalani/constants.dart';
 import 'package:samata_dartachalani/createChalani.dart';
 import 'package:samata_dartachalani/createDarta.dart';
+import 'package:samata_dartachalani/importfromExcel';
 import 'package:samata_dartachalani/models/chalani.dart';
 import 'package:samata_dartachalani/models/darta.dart';
 import 'package:samata_dartachalani/models/user.dart';
-import 'package:path_provider_windows/path_provider_windows.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:samata_dartachalani/tauko.dart';
 import 'package:samata_dartachalani/viewAllDartaChalani.dart';
@@ -32,7 +32,7 @@ void main() async {
   await Hive.openBox<Chalani>('chalani');
   await Hive.openBox<User>('users');
   await Hive.openBox('settings');
-  runApp(MyApp());
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
@@ -45,11 +45,11 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Samata gharelu',
       debugShowCheckedModeBanner: false,
-      home: loggedInUser != null ? HomePage() : LoginPage(),
+      home: loggedInUser != null ? const HomePage() : const LoginPage(),
       theme: ThemeData(
         textTheme: const TextTheme(
           headlineLarge: TextStyle(
-              fontSize: 48,
+              fontSize: 30,
               fontWeight: FontWeight.w600,
               color: Color(0xff0D0D0D)),
           headlineMedium: TextStyle(
@@ -101,10 +101,10 @@ class _LoginPageState extends State<LoginPage> {
         // Save the logged-in user session
         Hive.box('settings').put('loggedInUser', user.username);
         Navigator.pushReplacement(
-            context, MaterialPageRoute(builder: (context) => HomePage()));
+            context, MaterialPageRoute(builder: (context) => const HomePage()));
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Invalid username or password')));
+            const SnackBar(content: Text('Invalid username or password')));
       }
     }
   }
@@ -120,13 +120,15 @@ class _LoginPageState extends State<LoginPage> {
               child: SingleChildScrollView(
                 child: Column(
                   children: [
-                    Tauko(header: 'Darta Chalani Record',),
+                    const Tauko(
+                      header: 'Darta Chalani Record',
+                    ),
                     Container(
                       width: getwidth(context) / 3,
                       // height: getheight(context) * 0.5,
                       decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(12),
-                          border: Border.all(color: Color(0xff108841))),
+                          border: Border.all(color: const Color(0xff108841))),
                       child: Form(
                         key: _formKey,
                         child: Padding(
@@ -142,14 +144,14 @@ class _LoginPageState extends State<LoginPage> {
                               SizedBox(height: getheight(context) * 0.04),
                               Text('User:', style: gettext(context).bodyLarge),
                               TextFormField(
-                                cursorColor: Color(0xffBFBABA),
+                                cursorColor: const Color(0xffBFBABA),
                                 controller: usernameController,
                                 decoration: InputDecoration(
                                   enabledBorder: border,
                                   focusedBorder: border,
                                   hintText: 'Enter your Username',
                                   hintStyle: gettext(context).labelLarge,
-                                  border: OutlineInputBorder(),
+                                  border: const OutlineInputBorder(),
                                 ),
                                 validator: (value) {
                                   if (value == null || value.isEmpty) {
@@ -164,7 +166,7 @@ class _LoginPageState extends State<LoginPage> {
                               TextFormField(
                                 controller: passwordController,
                                 obscureText: _isObscure,
-                                cursorColor: Color(0xffBFBABA),
+                                cursorColor: const Color(0xffBFBABA),
                                 decoration: InputDecoration(
                                   enabledBorder: border,
                                   focusedBorder: border,
@@ -205,7 +207,7 @@ class _LoginPageState extends State<LoginPage> {
                                     width: double.infinity,
                                     decoration: BoxDecoration(
                                       borderRadius: BorderRadius.circular(12),
-                                      color: Color(0xff108841),
+                                      color: const Color(0xff108841),
                                     ),
                                     child: Center(
                                         child: Text('Login',
@@ -217,10 +219,10 @@ class _LoginPageState extends State<LoginPage> {
                                   onPressed: () {
                                     Navigator.push(context,
                                         MaterialPageRoute(builder: (context) {
-                                      return SignupPage();
+                                      return const SignupPage();
                                     }));
                                   },
-                                  child: Text('New User, Sign Up'))
+                                  child: const Text('New User, Sign Up'))
                             ],
                           ),
                         ),
@@ -234,8 +236,6 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 }
-
-
 
 class SignupPage extends StatefulWidget {
   const SignupPage({super.key});
@@ -263,8 +263,8 @@ class _SignupPageState extends State<SignupPage> {
       _formKey.currentState!.save();
       final newUser = User(username: username, password: password);
       userBox.add(newUser);
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text('Registration Successful!')));
+      ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Registration Successful!')));
       Navigator.pop(context);
     }
   }
@@ -282,12 +282,14 @@ class _SignupPageState extends State<SignupPage> {
                   // mainAxisAlignment: MainAxisAlignment.center,
                   // crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    Tauko(header: 'Darta Chalani Record',),
+                    const Tauko(
+                      header: 'Darta Chalani Record',
+                    ),
                     Container(
                       // height: getheight(context) * 0.5,
                       decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(12),
-                          border: Border.all(color: Color(0xff108841))),
+                          border: Border.all(color: const Color(0xff108841))),
                       width: getwidth(context) / 3,
                       child: Form(
                         key: _formKey,
@@ -305,7 +307,7 @@ class _SignupPageState extends State<SignupPage> {
                               Text('User:', style: gettext(context).bodyLarge),
                               TextFormField(
                                 controller: usernameController,
-                                cursorColor: Color(0xffBFBABA),
+                                cursorColor: const Color(0xffBFBABA),
                                 decoration: InputDecoration(
                                   enabledBorder: border,
                                   focusedBorder: border,
@@ -325,7 +327,7 @@ class _SignupPageState extends State<SignupPage> {
                               TextFormField(
                                 controller: passwordController,
                                 obscureText: _isObscure,
-                                cursorColor: Color(0xffBFBABA),
+                                cursorColor: const Color(0xffBFBABA),
                                 decoration: InputDecoration(
                                   enabledBorder: border,
                                   focusedBorder: border,
@@ -357,7 +359,7 @@ class _SignupPageState extends State<SignupPage> {
                               TextFormField(
                                 controller: confirmPasswordController,
                                 obscureText: _isObscure,
-                                cursorColor: Color(0xffBFBABA),
+                                cursorColor: const Color(0xffBFBABA),
                                 decoration: InputDecoration(
                                   enabledBorder: border,
                                   focusedBorder: border,
@@ -400,7 +402,7 @@ class _SignupPageState extends State<SignupPage> {
                                     width: double.infinity,
                                     decoration: BoxDecoration(
                                       borderRadius: BorderRadius.circular(12),
-                                      color: Color(0xff108841),
+                                      color: const Color(0xff108841),
                                     ),
                                     child: const Center(
                                         child: Text('Signup',
@@ -411,7 +413,7 @@ class _SignupPageState extends State<SignupPage> {
                                   onPressed: () {
                                     Navigator.pop(context);
                                   },
-                                  child: Text(
+                                  child: const Text(
                                       'Already have an account, go to login!'))
                             ],
                           ),
@@ -428,13 +430,15 @@ class _SignupPageState extends State<SignupPage> {
 }
 
 class HomePage extends StatelessWidget {
+  const HomePage({super.key});
+
   void _logout(BuildContext context) {
     // Clear the logged-in user session
     Hive.box('settings').delete('loggedInUser');
     // Navigate back to the login page
     Navigator.pushAndRemoveUntil(
       context,
-      MaterialPageRoute(builder: (context) => LoginPage()),
+      MaterialPageRoute(builder: (context) => const LoginPage()),
       (route) => false,
     );
   }
@@ -502,7 +506,9 @@ class HomePage extends StatelessWidget {
         child: Column(
           // mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            Tauko(header: 'Please select your choice',),
+            const Tauko(
+              header: 'Please select your choice',
+            ),
             ElevatedButton(
               onPressed: () {
                 Navigator.push(context, MaterialPageRoute(builder: (context) {
@@ -510,43 +516,57 @@ class HomePage extends StatelessWidget {
                 }));
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: Color(0xff108841),
-                minimumSize: Size(200, 50),
+                backgroundColor: const Color(0xff108841),
+                minimumSize: const Size(200, 50),
               ),
-              child: Text('View All Darta Chalanis',style:gettext(context).titleMedium),
+              child: Text('View All Darta Chalanis',
+                  style: gettext(context).titleMedium),
             ),
-            SizedBox(height: getheight(context)*0.04),
+            SizedBox(height: getheight(context) * 0.04),
             ElevatedButton(
               onPressed: () {
                 Navigator.push(context, MaterialPageRoute(builder: (context) {
-                  return CreateDartaScreen();
+                  return const CreateDartaScreen();
                 }));
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: Color(0xff108841),
-                minimumSize: Size(200, 50),
+                backgroundColor: const Color(0xff108841),
+                minimumSize: const Size(200, 50),
               ),
-              child: Text('Create Darta',style:gettext(context).titleMedium),
+              child: Text('Create Darta', style: gettext(context).titleMedium),
             ),
-            SizedBox(height: getheight(context)*0.04),
+            SizedBox(height: getheight(context) * 0.04),
             ElevatedButton(
               onPressed: () {
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) {
-                    return CreateChalaniScreen();
+                    return const CreateChalaniScreen();
                   }),
                 );
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: Color(0xff108841),
-                minimumSize: Size(200, 50),
+                backgroundColor: const Color(0xff108841),
+                minimumSize: const Size(200, 50),
               ),
-              child: Text('Create Chalani',style:gettext(context).titleMedium),
+              child:
+                  Text('Create Chalani', style: gettext(context).titleMedium),
             ),
-            SizedBox(height: getheight(context)*0.04),
-             TextButton(
-               child:Text('Logout',style: gettext(context).bodyLarge),
+            // ElevatedButton(
+            //   onPressed: () {
+            //     ImportService().importFromExcel(context);
+            //   },
+            //   style: ElevatedButton.styleFrom(
+            //     backgroundColor: const Color(0xff108841),
+            //     minimumSize: const Size(200, 50),
+            //   ),
+            //   child: Text('Import from excel',
+            //       style: gettext(context).titleMedium),
+            // ),
+            SizedBox(height: getheight(context) * 0.04),
+            SizedBox(height: getheight(context) * 0.04),
+            TextButton(
+              child: Text('Logout', style: gettext(context).bodyLarge),
               onPressed: () {
                 _logout(context);
               },

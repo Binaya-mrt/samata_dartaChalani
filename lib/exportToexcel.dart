@@ -1,8 +1,9 @@
+import 'dart:io';
+
 import 'package:excel/excel.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
-import 'package:path_provider/path_provider.dart';
-import 'dart:io';
 import 'models/darta.dart';
 import 'models/chalani.dart';
 
@@ -22,6 +23,7 @@ class ExportService {
       TextCellValue('Fiscal Year'),
       TextCellValue('Incoming Institution Name'),
       TextCellValue('Subject'),
+      TextCellValue('Image Path'), // New column for image path
     ]);
 
     for (var i = 0; i < dartaBox.length; i++) {
@@ -32,6 +34,7 @@ class ExportService {
         TextCellValue(darta?.fiscalYear ?? ''),
         TextCellValue(darta?.incomingInstitutionName ?? ''),
         TextCellValue(darta?.subject ?? ''),
+        TextCellValue(darta?.filePath ?? ''), // Exporting the image path
       ]);
     }
 
@@ -43,6 +46,7 @@ class ExportService {
       TextCellValue('Fiscal Year'),
       TextCellValue('Outgoing Institution Name'),
       TextCellValue('Subject'),
+      TextCellValue('Image Path'), // New column for image path
     ]);
 
     for (var i = 0; i < chalaniBox.length; i++) {
@@ -53,14 +57,19 @@ class ExportService {
         TextCellValue(chalani?.fiscalYear ?? ''),
         TextCellValue(chalani?.outgoingInstitutionName ?? ''),
         TextCellValue(chalani?.subject ?? ''),
+        TextCellValue(chalani?.filePath ?? ''), // Exporting the image path
       ]);
     }
 
     // Save the Excel file
-    Directory directory = await getApplicationDocumentsDirectory();
+    String? selectedDirectory = await FilePicker.platform.getDirectoryPath();
+    if (selectedDirectory == null) {
+      // User canceled the picker
+      return;
+    }
     excel.delete('Sheet1');
 
-    var filePath = '${directory.path}/darta_chalani_export.xlsx';
+    var filePath = '${selectedDirectory}/darta_chalani_export.xlsx';
     var fileBytes = excel.save();
     if (fileBytes == null) return;
 
@@ -78,9 +87,9 @@ class ExportService {
       );
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
+        const SnackBar(
             content: Text(
-                'The file is being used by another application,so it can\'t be completed at the moment')),
+                'The file is being used by another application, so it can\'t be completed at the moment')),
       );
     }
   }

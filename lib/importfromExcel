@@ -1,0 +1,67 @@
+// import 'package:excel/excel.dart';
+// import 'package:file_picker/file_picker.dart';
+// import 'package:flutter/material.dart';
+// import 'package:hive/hive.dart';
+// import 'models/darta.dart';
+// import 'models/chalani.dart';
+
+// class ImportService {
+//   Future<void> importFromExcel(BuildContext context) async {
+//     // Open file picker to select Excel file
+//     FilePickerResult? result = await FilePicker.platform.pickFiles(
+//       type: FileType.custom,
+//       allowedExtensions: ['xlsx'],
+//     );
+
+//     if (result != null) {
+//       var file = result.files.first;
+//       var bytes = file.bytes;
+//       if (bytes == null) return;
+
+//       // Parse the Excel file
+//       var excel = Excel.decodeBytes(bytes);
+
+//       var dartaBox = Hive.box<Darta>('darta');
+//       var chalaniBox = Hive.box<Chalani>('chalani');
+
+//       // Import Darta data
+//       Sheet? dartaSheet = excel['Darta'];
+//       if (dartaSheet != null) {
+//         for (var row in dartaSheet.rows.skip(1)) {
+//           var darta = Darta(
+//             snNumber: row[0]!.value!.toString(),
+//             date: row[1]!.value!.toString(),
+//             fiscalYear: row[2]!.value!.toString(),
+//             incomingInstitutionName: row[3]!.value!.toString(),
+//             subject: row[4]!.value!.toString(),
+//           );
+//           dartaBox.add(darta);
+//         }
+//       }
+
+//       // Import Chalani data
+//       Sheet? chalaniSheet = excel['Chalani'];
+//       if (chalaniSheet != null) {
+//         for (var row in chalaniSheet.rows.skip(1)) {
+//           var chalani = Chalani(
+//             snNumber: row[0]!.value!.toString(),
+//             date: row[1]!.value!.toString(),
+//             fiscalYear: row[2]!.value!.toString(),
+//             outgoingInstitutionName: row[3]!.value!.toString(),
+//             subject: row[4]!.value!.toString(),
+//           );
+//           chalaniBox.add(chalani);
+//         }
+//       }
+
+//       ScaffoldMessenger.of(context).showSnackBar(
+//         SnackBar(content: Text('Data imported successfully!')),
+//       );
+//     } else {
+//       // User canceled the picker
+//       ScaffoldMessenger.of(context).showSnackBar(
+//         SnackBar(content: Text('Import canceled.')),
+//       );
+//     }
+//   }
+// }

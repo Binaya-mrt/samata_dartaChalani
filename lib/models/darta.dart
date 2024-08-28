@@ -20,9 +20,9 @@ class Darta extends HiveObject {
   final String subject;
 
   @HiveField(5)
-  final String filePath;
+  String? filePath;
   @HiveField(6)
-  final String fileType;
+  String? fileType;
 
   Darta({
     required this.date,
@@ -30,7 +30,7 @@ class Darta extends HiveObject {
     required this.fiscalYear,
     required this.incomingInstitutionName,
     required this.subject,
-    required this.filePath,
-    required this.fileType,
+    this.filePath,
+    this.fileType,
   });
 }

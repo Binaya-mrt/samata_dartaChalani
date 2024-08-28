@@ -22,8 +22,8 @@ class ChalaniAdapter extends TypeAdapter<Chalani> {
       fiscalYear: fields[2] as String,
       outgoingInstitutionName: fields[3] as String,
       subject: fields[4] as String,
-      filePath: fields[5] as String,
-      fileType: fields[6] as String,
+      filePath: fields[5] as String?,
+      fileType: fields[6] as String?,
     );
   }
 

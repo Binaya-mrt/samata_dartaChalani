@@ -13,6 +13,6 @@ TextTheme gettext(BuildContext context) {
 }
 
 final border = OutlineInputBorder(
-  borderSide: BorderSide(color: Color(0xffF7D6D6)),
+  borderSide: const BorderSide(color: Color(0xffF7D6D6)),
   borderRadius: BorderRadius.circular(4),
 );

@@ -22,8 +22,8 @@ class DartaAdapter extends TypeAdapter<Darta> {
       fiscalYear: fields[2] as String,
       incomingInstitutionName: fields[3] as String,
       subject: fields[4] as String,
-      filePath: fields[5] as String,
-      fileType: fields[6] as String,
+      filePath: fields[5] as String?,
+      fileType: fields[6] as String?,
     );
   }
 
