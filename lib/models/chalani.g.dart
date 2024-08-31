@@ -22,15 +22,14 @@ class ChalaniAdapter extends TypeAdapter<Chalani> {
       fiscalYear: fields[2] as String,
       outgoingInstitutionName: fields[3] as String,
       subject: fields[4] as String,
-      filePath: fields[5] as String?,
-      fileType: fields[6] as String?,
+      imageBase64: fields[5] as String?,
     );
   }
 
   @override
   void write(BinaryWriter writer, Chalani obj) {
     writer
-      ..writeByte(7)
+      ..writeByte(6)
       ..writeByte(0)
       ..write(obj.date)
       ..writeByte(1)
@@ -42,9 +41,7 @@ class ChalaniAdapter extends TypeAdapter<Chalani> {
       ..writeByte(4)
       ..write(obj.subject)
       ..writeByte(5)
-      ..write(obj.filePath)
-      ..writeByte(6)
-      ..write(obj.fileType);
+      ..write(obj.imageBase64);
   }
 
   @override

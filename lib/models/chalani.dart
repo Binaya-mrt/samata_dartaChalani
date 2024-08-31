@@ -1,3 +1,5 @@
+import 'dart:convert';
+import 'dart:io';
 import 'package:hive/hive.dart';
 
 part 'chalani.g.dart';
@@ -20,9 +22,7 @@ class Chalani extends HiveObject {
   final String subject;
 
   @HiveField(5)
-  String? filePath;
-  @HiveField(6)
-  String? fileType;
+  String? imageBase64; // Store the image as a base64 string
 
   Chalani({
     required this.date,
@@ -30,7 +30,27 @@ class Chalani extends HiveObject {
     required this.fiscalYear,
     required this.outgoingInstitutionName,
     required this.subject,
-    this.filePath,
-    this.fileType,
+    this.imageBase64,
   });
+  Map<String, dynamic> toJson() {
+    return {
+      'snNumber': snNumber,
+      'date': date,
+      'fiscalYear': fiscalYear,
+      'subject': subject,
+      'outgoingInstitutionName': outgoingInstitutionName,
+      'imageBase64': imageBase64,
+    };
+  }
+
+  factory Chalani.fromJson(Map<String, dynamic> json) {
+    return Chalani(
+      date: json['date'],
+      snNumber: json['snNumber'],
+      fiscalYear: json['fiscalYear'],
+      outgoingInstitutionName: json['outgoingInstitutionName'],
+      subject: json['subject'],
+      imageBase64: json['imageBase64'],
+    );
+  }
 }

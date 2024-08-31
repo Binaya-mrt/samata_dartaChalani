@@ -3,8 +3,10 @@ import 'package:samata_dartachalani/constants.dart';
 
 class Tauko extends StatelessWidget {
   final String header;
-  const Tauko({
-    super.key, required this.header,
+
+  Tauko({
+    super.key,
+    required this.header,
   });
 
   @override
@@ -17,8 +19,7 @@ class Tauko extends StatelessWidget {
         Text('Samata Gharelu Laghubitta',
             style: gettext(context).headlineMedium),
         SizedBox(height: getheight(context) * 0.04),
-        Text(header,
-            style: gettext(context).headlineLarge),
+        Text(header, style: gettext(context).headlineLarge),
         SizedBox(height: getheight(context) * 0.04),
       ],
     );

@@ -1,12 +1,18 @@
+import 'dart:convert';
+import 'dart:developer';
+
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
+import 'package:mime/mime.dart';
 import 'package:nepali_utils/nepali_utils.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:samata_dartachalani/constants.dart';
 import 'package:samata_dartachalani/tauko.dart';
 import 'dart:io';
 import 'models/darta.dart';
 import 'package:nepali_date_picker/nepali_date_picker.dart';
+import 'package:path/path.dart' as path;
 
 class CreateDartaScreen extends StatefulWidget {
   const CreateDartaScreen({super.key});
@@ -18,6 +24,8 @@ class CreateDartaScreen extends StatefulWidget {
 class _CreateDartaScreenState extends State<CreateDartaScreen> {
   final _formKey = GlobalKey<FormState>();
   final _institutionNameController = TextEditingController();
+  final _snController = TextEditingController();
+
   final _subjectController = TextEditingController();
   NepaliDateTime? _selectedNepaliDate;
   String? _selectedFiscalYear;
@@ -30,20 +38,19 @@ class _CreateDartaScreenState extends State<CreateDartaScreen> {
     super.initState();
     _initializeSN();
     getTodayDate();
+    _snController.value = TextEditingValue(text: _snNumber.toString() + " ");
   }
 
   void _initializeSN() {
     final box = Hive.box<Darta>('darta');
     if (box.isNotEmpty) {
-      _snNumber = int.parse(box.values.last.snNumber) + 1;
+      _snNumber = int.parse(box.values.last.snNumber.split(' ')[0]) + 1;
     }
   }
 
   void getTodayDate() {
     _selectedNepaliDate = NepaliDateTime.now();
   }
-
-// pick today date and display instead of select date
 
   Future<void> _pickFile() async {
     try {
@@ -64,26 +71,48 @@ class _CreateDartaScreenState extends State<CreateDartaScreen> {
     }
   }
 
-  void _submitForm() {
+  void _submitForm() async {
     if (_formKey.currentState!.validate()) {
-      final newDarta = Darta(
-        date: _selectedNepaliDate!.toString().split(' ')[0],
-        snNumber: _snNumber.toString(),
-        fiscalYear: _selectedFiscalYear!,
-        incomingInstitutionName: _institutionNameController.text,
-        subject: _subjectController.text,
-        filePath: _selectedFile!.path,
-        fileType:
-            _selectedFile?.path.endsWith('.pdf') == true ? 'pdf' : 'image',
-      );
+      try {
+        String? documentBase64;
+        if (_selectedFile != null) {
+          final bytes = await _selectedFile!.readAsBytes();
+          final mimeType = lookupMimeType(_selectedFile!.path);
+          if (mimeType != null) {
+            documentBase64 = 'data:$mimeType;base64,' + base64Encode(bytes);
+          } else {
+            log('Unsupported file type');
+          }
+        }
+        // TODO: excel formating width, bold title, table done
 
-      Hive.box<Darta>('darta').add(newDarta);
+        // TODO: Design on text form fields
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Darta Created Successfully')),
-      );
+        // TODO: Migrations
 
-      Navigator.of(context).pop();
+        // Create a new Darta object with the new file path
+        final newDarta = Darta(
+          date: _selectedNepaliDate!.toString().split(' ')[0],
+          snNumber: _snController.text,
+          fiscalYear: _selectedFiscalYear!,
+          incomingInstitutionName: _institutionNameController.text,
+          subject: _subjectController.text,
+          imageBase64: documentBase64,
+        );
+
+        // Save the Darta object in Hive
+        Hive.box<Darta>('darta').add(newDarta);
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Darta Created Successfully')),
+        );
+
+        Navigator.of(context).pop();
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to save Darta: $e')),
+        );
+      }
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Please fill in all the details')),
@@ -95,178 +124,267 @@ class _CreateDartaScreenState extends State<CreateDartaScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      body: Form(
-        key: _formKey,
-        child: Align(
-          alignment: Alignment.topCenter,
-          child: Stack(children: [
-            Column(
-              // crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                const Tauko(header: 'Darta'),
-                Container(
-                  width: getwidth(context) / 1.5,
-                  decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: const Color(0xff108841))),
-                  child: Padding(
-                    padding: const EdgeInsets.all(24.0),
-                    child: Column(
-                      children: [
-                        ListTile(
-                          title: Text(
-                            "Date: ${_selectedNepaliDate != null ? NepaliDateFormat.yMMMMd().format(_selectedNepaliDate!) : 'Select Date'}",
-                          ),
-                          trailing: const Icon(Icons.calendar_today),
-                          onTap: () async {
-                            NepaliDateTime? picked =
-                                await showAdaptiveDatePicker(
-                              context: context,
-                              initialDate: NepaliDateTime.now(),
-                              firstDate: NepaliDateTime(2000),
-                              lastDate: NepaliDateTime(2100),
-                              initialDatePickerMode: DatePickerMode.day,
-                            );
-                            if (picked != null &&
-                                picked != _selectedNepaliDate) {
-                              setState(() {
-                                _selectedNepaliDate = picked;
-                              });
-                            }
-                          },
-                        ),
-                        ListTile(
-                          title: Text(
-                              "Darta No: ${NepaliUnicode.convert("$_snNumber")}"),
-                        ),
-                        SizedBox(
-                          width: getwidth(context) / 1.66,
-                          child: DropdownButtonFormField<String>(
-                            value: _selectedFiscalYear,
-                            // focusColor: Color(0xff108841),
-                            style: Theme.of(context).textTheme.headlineMedium,
-                            decoration:
-                                const InputDecoration(labelText: 'Fiscal Year'),
-                            items: const [
-                              DropdownMenuItem(
-                                  value: '2078/79', child: Text('2078/79')),
-                              DropdownMenuItem(
-                                  value: '2079/80', child: Text('2079/80')),
-                              DropdownMenuItem(
-                                  value: '2080/81', child: Text('2080/81')),
-                              DropdownMenuItem(
-                                  value: '2081/82', child: Text('2081/82')),
-                              DropdownMenuItem(
-                                  value: '2082/83', child: Text('2082/83')),
-                              // Add more fiscal years as needed
-                            ],
-                            onChanged: (value) {
-                              setState(() {
-                                _selectedFiscalYear = value!;
-                              });
-                            },
-                            validator: (value) =>
-                                value == null ? 'Select a fiscal year' : null,
-                          ),
-                        ),
-                        Row(
-                          children: [
-                            Expanded(
-                              child: ListTile(
-                                subtitle: TextFormField(
-                                  controller: _institutionNameController,
-                                  decoration: const InputDecoration(
-                                      labelText: 'Incoming Institution Name'),
-                                  validator: (value) => value!.isEmpty
-                                      ? 'Enter institution name'
-                                      : null,
+      body: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            IconButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              icon: const Icon(
+                Icons.arrow_back_ios,
+                size: 14,
+              ),
+            ),
+            Center(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: <Widget>[
+                    Tauko(
+                      header: 'Darta',
+                    ),
+                    Container(
+                      width: getwidth(context) / 1.5,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: const Color(0xff108841)),
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.all(24.0),
+                        child: Form(
+                          key: _formKey,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              ListTile(
+                                title: RichText(
+                                  text: TextSpan(
+                                    text: 'Date ',
+                                    style: const TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w600,
+                                        color: Colors.black),
+                                    children: <TextSpan>[
+                                      TextSpan(
+                                          text:
+                                              '${_selectedNepaliDate != null ? NepaliDateFormat.yMMMMd().format(_selectedNepaliDate!) : 'Select Date'}',
+                                          style: const TextStyle(
+                                              fontWeight: FontWeight.w400,
+                                              fontSize: 16,
+                                              color: Colors.black)),
+                                    ],
+                                  ),
                                 ),
+                                trailing: const Icon(Icons.calendar_today),
+                                onTap: () async {
+                                  NepaliDateTime? picked =
+                                      await showAdaptiveDatePicker(
+                                    context: context,
+                                    initialDate: NepaliDateTime.now(),
+                                    firstDate: NepaliDateTime(2000),
+                                    lastDate: NepaliDateTime(2100),
+                                    initialDatePickerMode: DatePickerMode.day,
+                                  );
+                                  if (picked != null &&
+                                      picked != _selectedNepaliDate) {
+                                    setState(() {
+                                      _selectedNepaliDate = picked;
+                                    });
+                                  }
+                                },
                               ),
-                            ),
-                            Expanded(
-                              child: ListTile(
-                                subtitle: TextFormField(
-                                  controller: _subjectController,
-                                  decoration: const InputDecoration(
-                                      labelText: 'Subject'),
-                                  validator: (value) =>
-                                      value!.isEmpty ? 'Enter subject' : null,
-                                ),
-                              ),
-                            )
-                          ],
-                        ),
-                        SizedBox(height: getheight(context) * 0.04),
-                        _selectedFile != null
-                            ? _selectedFile!.path.endsWith('.pdf')
-                                ? Text(
-                                    'Selected PDF: ${_selectedFile!.path.split('/').last}')
-                                : Image.file(
-                                    _selectedFile!,
-                                    height: 100,
-                                    width: 150,
-                                  )
-                            : GestureDetector(
-                                onTap: _pickFile,
+                              Padding(
+                                padding: const EdgeInsets.all(16.0),
                                 child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Container(
-                                      height: 100,
-                                      width: 150,
-                                      child: Icon(
-                                        Icons.upload,
-                                        color: Color(0xff108841),
-                                      ),
-                                      decoration: BoxDecoration(
-                                        color: Colors.grey[300],
-                                        borderRadius: BorderRadius.circular(8),
+                                    Row(
+                                      children: [
+                                        const Text(
+                                          'Darta Number: ',
+                                          style: TextStyle(
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.w600,
+                                              color: Colors.black),
+                                        ),
+                                        const SizedBox(
+                                          width: 3,
+                                        ),
+                                        SizedBox(
+                                          width: 100,
+                                          height: 40,
+                                          child: TextFormField(
+                                            controller: _snController,
+                                            decoration: const InputDecoration(
+                                              border: OutlineInputBorder(),
+                                              focusedBorder:
+                                                  OutlineInputBorder(),
+                                            ),
+                                            style: const TextStyle(
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.w400,
+                                              color: Colors.black,
+                                            ),
+                                            validator: (value) => value!.isEmpty
+                                                ? 'Enter subject'
+                                                : null,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    SizedBox(height: getheight(context) * 0.02),
+                                    const Text(
+                                      'Select Fiscal Year',
+                                      style: TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w600,
+                                          color: Colors.black),
+                                    ),
+                                    SizedBox(height: getheight(context) * 0.02),
+                                    SizedBox(
+                                      width: getwidth(context) / 3,
+                                      child: DropdownButtonFormField<String>(
+                                        hint: Text('Choose fiscal year'),
+                                        value: _selectedFiscalYear,
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .bodyMedium,
+                                        items: fiscalYears
+                                            .map((year) => DropdownMenuItem(
+                                                value: year, child: Text(year)))
+                                            .toList(),
+                                        onChanged: (value) {
+                                          setState(() {
+                                            _selectedFiscalYear = value!;
+                                          });
+                                        },
+                                        validator: (value) => value == null
+                                            ? 'Select a fiscal year'
+                                            : null,
                                       ),
                                     ),
-                                    Text(
-                                      'Upload Image',
+                                    SizedBox(height: getheight(context) * 0.02),
+                                    const Text(
+                                      'Incomming Institutions:-',
                                       style: TextStyle(
-                                          color: Color(0xff108841),
+                                          fontSize: 16,
                                           fontWeight: FontWeight.w600,
-                                          fontSize: 14),
+                                          color: Colors.black),
+                                    ),
+                                    ListTile(
+                                      subtitle: TextFormField(
+                                        decoration: const InputDecoration(
+                                            border: OutlineInputBorder(),
+                                            focusedBorder:
+                                                OutlineInputBorder()),
+                                        style: const TextStyle(
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.w400,
+                                            color: Colors.black),
+                                        controller: _institutionNameController,
+                                        validator: (value) => value!.isEmpty
+                                            ? 'Enter institution name'
+                                            : null,
+                                      ),
+                                    ),
+                                    SizedBox(height: getheight(context) * 0.02),
+                                    const Text(
+                                      'Enter Subject:-',
+                                      style: TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w600,
+                                          color: Colors.black),
+                                    ),
+                                    ListTile(
+                                      subtitle: TextFormField(
+                                        decoration: const InputDecoration(
+                                            border: OutlineInputBorder(),
+                                            focusedBorder:
+                                                OutlineInputBorder()),
+                                        style: const TextStyle(
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.w400,
+                                            color: Colors.black),
+                                        controller: _subjectController,
+                                        validator: (value) => value!.isEmpty
+                                            ? 'Enter subject'
+                                            : null,
+                                      ),
+                                    ),
+                                    SizedBox(height: getheight(context) * 0.04),
+                                    _selectedFile != null
+                                        ? _selectedFile!.path.endsWith('.pdf')
+                                            ? Text(
+                                                'Selected PDF: ${_selectedFile!.path.split('/').last}')
+                                            : Image.file(
+                                                _selectedFile!,
+                                                height: 100,
+                                                width: 150,
+                                              )
+                                        : GestureDetector(
+                                            onTap: _pickFile,
+                                            child: Column(
+                                              children: [
+                                                Container(
+                                                  height: 100,
+                                                  width: 150,
+                                                  decoration: BoxDecoration(
+                                                    color: Colors.grey[300],
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            8),
+                                                  ),
+                                                  child: const Icon(
+                                                    Icons.upload,
+                                                    color: Color(0xff108841),
+                                                  ),
+                                                ),
+                                                const Text(
+                                                  'Upload Document',
+                                                  style: TextStyle(
+                                                      color: Color(0xff108841),
+                                                      fontWeight:
+                                                          FontWeight.w600,
+                                                      fontSize: 14),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                    const SizedBox(height: 20),
+                                    ElevatedButton(
+                                      onPressed: _submitForm,
+                                      child: const Padding(
+                                        padding: EdgeInsets.symmetric(
+                                            horizontal: 30.0, vertical: 8),
+                                        child: Text(
+                                          'Submit',
+                                          style: TextStyle(color: Colors.white),
+                                        ),
+                                      ),
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor:
+                                            const Color(0xff108841),
+                                      ),
                                     ),
                                   ],
                                 ),
                               ),
-                        // ElevatedButton(
-                        //   onPressed: _pickFile,
-                        //   child: const Text('Pick Image or PDF'),
-                        // ),
-                        const SizedBox(height: 20),
-                        ElevatedButton(
-                          onPressed: _submitForm,
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 30.0, vertical: 8),
-                            child: const Text(
-                              'Submit',
-                              style: TextStyle(color: Colors.white),
-                            ),
-                          ),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xff108841),
+                            ],
                           ),
                         ),
-                      ],
+                      ),
                     ),
-                  ),
+                    const SizedBox(
+                        height: 20), // Adjust the bottom padding as needed
+                  ],
                 ),
-              ],
+              ),
             ),
-            GestureDetector(
-              onTap: () {
-                Navigator.pop(context);
-              },
-              child: const Positioned(
-                  left: 0,
-                  top: 0,
-                  child: Icon(Icons.arrow_back, size: 40, color: Colors.black)),
-            )
-          ]),
+          ],
         ),
       ),
     );

@@ -5,7 +5,7 @@ part 'darta.g.dart'; // This will be generated
 @HiveType(typeId: 1)
 class Darta extends HiveObject {
   @HiveField(0)
-  final String date;
+  final String date; // Date as a string
 
   @HiveField(1)
   final String snNumber;
@@ -20,9 +20,7 @@ class Darta extends HiveObject {
   final String subject;
 
   @HiveField(5)
-  String? filePath;
-  @HiveField(6)
-  String? fileType;
+  String? imageBase64; // Store the image as a base64 string
 
   Darta({
     required this.date,
@@ -30,7 +28,27 @@ class Darta extends HiveObject {
     required this.fiscalYear,
     required this.incomingInstitutionName,
     required this.subject,
-    this.filePath,
-    this.fileType,
+    this.imageBase64,
   });
+  Map<String, dynamic> toJson() {
+    return {
+      'snNumber': snNumber,
+      'date': date,
+      'fiscalYear': fiscalYear,
+      'subject': subject,
+      'incomingInstitutionName': incomingInstitutionName,
+      'imageBase64': imageBase64,
+    };
+  }
+
+  factory Darta.fromJson(Map<String, dynamic> json) {
+    return Darta(
+      date: json['date'],
+      snNumber: json['snNumber'],
+      fiscalYear: json['fiscalYear'],
+      incomingInstitutionName: json['incomingInstitutionName'],
+      subject: json['subject'],
+      imageBase64: json['imageBase64'],
+    );
+  }
 }

@@ -1,9 +1,12 @@
+import 'dart:ffi';
 import 'dart:io';
 
 import 'package:excel/excel.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
+import 'package:path/path.dart';
+import 'package:samata_dartachalani/constants.dart';
 import 'models/darta.dart';
 import 'models/chalani.dart';
 
@@ -17,14 +20,60 @@ class ExportService {
 
     // Add Darta sheet
     Sheet? dartaSheet = excel['Darta'];
-    dartaSheet.appendRow([
-      TextCellValue('SN'),
-      TextCellValue('Date'),
-      TextCellValue('Fiscal Year'),
-      TextCellValue('Incoming Institution Name'),
-      TextCellValue('Subject'),
-      TextCellValue('Image Path'), // New column for image path
-    ]);
+    CellStyle boldStyle = CellStyle(
+      fontFamily: getFontFamily(FontFamily.Arial),
+      bold: true,
+    );
+// gives border to sheet
+
+    // add auto width to cells
+
+    // dartaSheet.autoWidth = true;
+    dartaSheet.setColumnAutoFit(1);
+    dartaSheet.setColumnAutoFit(2);
+    dartaSheet.setColumnAutoFit(3);
+    dartaSheet.setColumnAutoFit(4);
+    dartaSheet.setColumnAutoFit(5);
+    dartaSheet.setColumnAutoFit(6);
+    // dartaSheet.setColumnAutoFit(1);
+
+    var cellSn = dartaSheet.cell(
+      CellIndex.indexByString('A1'),
+    );
+    cellSn.value = TextCellValue('SN');
+    cellSn.cellStyle = boldStyle;
+//
+    var cellDate = dartaSheet.cell(
+      CellIndex.indexByString('B1'),
+    );
+    cellDate.value = TextCellValue('Date');
+    cellDate.cellStyle = boldStyle;
+//
+
+    var cellFy = dartaSheet.cell(
+      CellIndex.indexByString('C1'),
+    );
+    cellFy.value = TextCellValue('Fiscal Year');
+    cellFy.cellStyle = boldStyle;
+//
+    var cellname = dartaSheet.cell(
+      CellIndex.indexByString('D1'),
+    );
+    cellname.value = TextCellValue('Incoming Institution Name');
+    cellname.cellStyle = boldStyle;
+//
+    var cellSubject = dartaSheet.cell(
+      CellIndex.indexByString('E1'),
+    );
+    cellSubject.value = TextCellValue('Subject');
+    cellSubject.cellStyle = boldStyle;
+//
+    // var cellPath = dartaSheet.cell(
+    //   CellIndex.indexByString('F1'),
+    // );
+    // cellPath.value = TextCellValue('Path');
+    // cellPath.cellStyle = boldStyle;
+//
 
     for (var i = 0; i < dartaBox.length; i++) {
       final darta = dartaBox.getAt(i);
@@ -34,20 +83,59 @@ class ExportService {
         TextCellValue(darta?.fiscalYear ?? ''),
         TextCellValue(darta?.incomingInstitutionName ?? ''),
         TextCellValue(darta?.subject ?? ''),
-        TextCellValue(darta?.filePath ?? ''), // Exporting the image path
+        // TextCellValue(darta?.filePath ?? ''), // Exporting the image path
       ]);
     }
 
     // Add Chalani sheet
     Sheet? chalaniSheet = excel['Chalani'];
-    chalaniSheet.appendRow([
-      TextCellValue('SN'),
-      TextCellValue('Date'),
-      TextCellValue('Fiscal Year'),
-      TextCellValue('Outgoing Institution Name'),
-      TextCellValue('Subject'),
-      TextCellValue('Image Path'), // New column for image path
-    ]);
+
+    // dartaSheet.autoWidth = true;
+    chalaniSheet.setColumnAutoFit(1);
+    chalaniSheet.setColumnAutoFit(2);
+    chalaniSheet.setColumnAutoFit(3);
+    chalaniSheet.setColumnAutoFit(4);
+    chalaniSheet.setColumnAutoFit(5);
+    chalaniSheet.setColumnAutoFit(6);
+    // dartaSheet.setColumnAutoFit(1);
+
+    var cellSnc = chalaniSheet.cell(
+      CellIndex.indexByString('A1'),
+    );
+    cellSnc.value = TextCellValue('SN');
+    cellSnc.cellStyle = boldStyle;
+//
+    var cellDatec = chalaniSheet.cell(
+      CellIndex.indexByString('B1'),
+    );
+    cellDatec.value = TextCellValue('Date');
+    cellDatec.cellStyle = boldStyle;
+//
+
+    var cellFyc = chalaniSheet.cell(
+      CellIndex.indexByString('C1'),
+    );
+    cellFyc.value = TextCellValue('Fiscal Year');
+    cellFyc.cellStyle = boldStyle;
+//
+    var cellnamec = chalaniSheet.cell(
+      CellIndex.indexByString('D1'),
+    );
+    cellnamec.value = TextCellValue('Outgoing Institution Name');
+    cellnamec.cellStyle = boldStyle;
+//
+    var cellSubjectc = chalaniSheet.cell(
+      CellIndex.indexByString('E1'),
+    );
+    cellSubjectc.value = TextCellValue('Subject');
+    cellSubjectc.cellStyle = boldStyle;
+//
+//     var cellPathc = chalaniSheet.cell(
+//       CellIndex.indexByString('F1'),
+//     );
+//     cellPathc.value = TextCellValue('Path');
+//     cellPathc.cellStyle = boldStyle;
+// //
 
     for (var i = 0; i < chalaniBox.length; i++) {
       final chalani = chalaniBox.getAt(i);
@@ -57,7 +145,7 @@ class ExportService {
         TextCellValue(chalani?.fiscalYear ?? ''),
         TextCellValue(chalani?.outgoingInstitutionName ?? ''),
         TextCellValue(chalani?.subject ?? ''),
-        TextCellValue(chalani?.filePath ?? ''), // Exporting the image path
+        // TextCellValue(chalani?.filePath ?? ''), // Exporting the image path
       ]);
     }
 

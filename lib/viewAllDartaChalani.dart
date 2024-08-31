@@ -1,12 +1,15 @@
+import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:hive/hive.dart';
 import 'package:nepali_date_picker/nepali_date_picker.dart';
-import 'package:nepali_utils/nepali_utils.dart';
+
 import 'package:samata_dartachalani/constants.dart';
 import 'package:samata_dartachalani/exportToexcel.dart';
+import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
 import 'models/darta.dart';
+import 'dart:developer';
 import 'models/chalani.dart';
 
 class ViewAllScreen extends StatefulWidget {
@@ -20,11 +23,9 @@ class _ViewAllScreenState extends State<ViewAllScreen> {
   String? _selectedFiscalYear;
   String? _incomingInstitutionFilter;
   String? _outgoingInstitutionFilter;
-  NepaliDateTimeRange? _selectedDateRange;
+  // NepaliDateTimeRange? _selectedDateRange;
   NepaliDateTime? _startDate;
   NepaliDateTime? _endDate;
-
-  final List<String> fiscalYears = ['2079/80', '2080/81', '2081/82'];
 
   @override
   Widget build(BuildContext context) {
@@ -191,7 +192,7 @@ class _ViewAllScreenState extends State<ViewAllScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              '${isDarta ? "Darta" : "Chalani"} No. ${NepaliUnicode.convert(item.snNumber)} - ${item.subject}',
+              '${isDarta ? "Darta" : "Chalani"} No. ${item.snNumber} - ${item.subject}',
               style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
@@ -205,9 +206,9 @@ class _ViewAllScreenState extends State<ViewAllScreen> {
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
                 ElevatedButton(
-                  onPressed: () => _viewImage(item.filePath),
+                  onPressed: () => _viewFile(item.imageBase64),
                   child: const Text(
-                    'View Image',
+                    'View Document',
                     style: TextStyle(color: Colors.white),
                   ),
                   style: ElevatedButton.styleFrom(
@@ -217,9 +218,14 @@ class _ViewAllScreenState extends State<ViewAllScreen> {
                 ),
                 const SizedBox(width: 8),
                 ElevatedButton(
-                  onPressed: () => _downloadImage(item.filePath),
+                  onPressed: () => _downloadFile(
+                      item.imageBase64,
+                      isDarta
+                          ? '${item.incomingInstitutionName}_${item.date}'
+                          : '${item.outgoingInstitutionName}_${item.date}',
+                      context),
                   child: const Text(
-                    'Download Image',
+                    'Download Document',
                     style: TextStyle(color: Colors.white),
                   ),
                   style: ElevatedButton.styleFrom(
@@ -235,37 +241,83 @@ class _ViewAllScreenState extends State<ViewAllScreen> {
     );
   }
 
-  void _viewImage(String filePath) {
+  void _viewFile(String base64File) {
+    // Check the MIME type prefix
+    final isPdf = base64File.startsWith('data:application/pdf;');
+    final isImage = base64File.startsWith('data:image/');
+
+    // Remove the data URL prefix
+    final base64Data = base64File.split(',')[1];
+    final bytes = base64Decode(base64Data);
+
     showDialog(
       context: context,
-      builder: (BuildContext context) => Dialog(
-        child: InteractiveViewer(
-          child: Image.file(File(filePath)),
-        ),
-      ),
+      builder: (BuildContext context) {
+        return Dialog(
+          child: isPdf
+              ? SfPdfViewer.memory(bytes)
+              : isImage
+                  ? InteractiveViewer(
+                      child: Image.memory(bytes),
+                    )
+                  : Center(child: Text('Unsupported file type')),
+        );
+      },
     );
   }
 
-  Future<void> _downloadImage(String sourcePath) async {
+  Future<void> _downloadFile(
+      String base64File, String fileName, BuildContext context) async {
     try {
+      // Check if the Base64 string has a MIME type prefix
+      final base64Data =
+          base64File.contains(',') ? base64File.split(',')[1] : base64File;
+      final bytes = base64Decode(base64Data);
+
+      // Determine the file extension based on the MIME type
+      String extension = '';
+      if (base64File.startsWith('data:image/jpeg;')) {
+        extension = '.jpg';
+      } else if (base64File.startsWith('data:image/png;')) {
+        extension = '.png';
+      } else if (base64File.startsWith('data:application/pdf;')) {
+        extension = '.pdf';
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Unsupported file type')),
+        );
+        return;
+      }
+
+      // Append the extension to the file name if not already present
+      if (!fileName.endsWith(extension)) {
+        fileName += extension;
+      }
+
+      // Prompt user to select a directory
       String? selectedDirectory = await FilePicker.platform.getDirectoryPath();
       if (selectedDirectory == null) {
         // User canceled the picker
         return;
       }
 
-      File sourceFile = File(sourcePath);
-      String fileName = sourcePath.split('/').last;
-      String destinationPath = '$selectedDirectory/$fileName';
+      // Construct the destination path
+      String destinationPath =
+          '$selectedDirectory${Platform.pathSeparator}$fileName';
 
-      await sourceFile.copy(destinationPath);
+      // Write the bytes to a file
+      File file = File(destinationPath);
+      await file.writeAsBytes(bytes);
 
+      // Notify user of success
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Image downloaded to $destinationPath')),
+        SnackBar(content: Text('File downloaded to $destinationPath')),
       );
     } catch (e) {
+      // Notify user of failure
+      log(e.toString());
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to download image: $e')),
+        SnackBar(content: Text('Failed to download file: $e')),
       );
     }
   }
@@ -334,47 +386,4 @@ class _ViewAllScreenState extends State<ViewAllScreen> {
     return (date.isAfter(start) || date.isAtSameMomentAs(start)) &&
         (date.isBefore(end) || date.isAtSameMomentAs(end));
   }
-
-  // String _formatNepaliDate(NepaliDateTime date) {
-  //   return '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
-  // }
-
-  // List<Darta> _filterDarta(List<Darta> dartaList) {
-  //   return dartaList.where((darta) {
-  //     bool matchesDateRange = _selectedDateRange == null ||
-  //         (_isDateInRange(
-  //             darta.date, _selectedDateRange!.start, _selectedDateRange!.end));
-  //     bool matchesFiscalYear = _selectedFiscalYear == null ||
-  //         darta.fiscalYear == _selectedFiscalYear;
-  //     bool matchesInstitution = _incomingInstitutionFilter == null ||
-  //         darta.incomingInstitutionName
-  //             .toLowerCase()
-  //             .contains(_incomingInstitutionFilter!.toLowerCase());
-
-  //     return matchesDateRange && matchesFiscalYear && matchesInstitution;
-  //   }).toList();
-  // }
-
-  // List<Chalani> _filterChalani(List<Chalani> chalaniList) {
-  //   return chalaniList.where((chalani) {
-  //     bool matchesDateRange = _selectedDateRange == null ||
-  //         (_isDateInRange(chalani.date, _selectedDateRange!.start,
-  //             _selectedDateRange!.end));
-  //     bool matchesFiscalYear = _selectedFiscalYear == null ||
-  //         chalani.fiscalYear == _selectedFiscalYear;
-  //     bool matchesInstitution = _outgoingInstitutionFilter == null ||
-  //         chalani.outgoingInstitutionName
-  //             .toLowerCase()
-  //             .contains(_outgoingInstitutionFilter!.toLowerCase());
-
-  //     return matchesDateRange && matchesFiscalYear && matchesInstitution;
-  //   }).toList();
-  // }
-
-  // bool _isDateInRange(
-  //     String dateStr, NepaliDateTime start, NepaliDateTime end) {
-  //   NepaliDateTime date = NepaliDateTime.parse(dateStr);
-  //   return (date.isAfter(start) || date.isAtSameMomentAs(start)) &&
-  //       (date.isBefore(end) || date.isAtSameMomentAs(end));
-  // }
 }

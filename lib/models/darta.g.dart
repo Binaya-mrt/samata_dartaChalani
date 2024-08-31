@@ -22,15 +22,14 @@ class DartaAdapter extends TypeAdapter<Darta> {
       fiscalYear: fields[2] as String,
       incomingInstitutionName: fields[3] as String,
       subject: fields[4] as String,
-      filePath: fields[5] as String?,
-      fileType: fields[6] as String?,
+      imageBase64: fields[5] as String?,
     );
   }
 
   @override
   void write(BinaryWriter writer, Darta obj) {
     writer
-      ..writeByte(7)
+      ..writeByte(6)
       ..writeByte(0)
       ..write(obj.date)
       ..writeByte(1)
@@ -42,9 +41,7 @@ class DartaAdapter extends TypeAdapter<Darta> {
       ..writeByte(4)
       ..write(obj.subject)
       ..writeByte(5)
-      ..write(obj.filePath)
-      ..writeByte(6)
-      ..write(obj.fileType);
+      ..write(obj.imageBase64);
   }
 
   @override
