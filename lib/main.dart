@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:samata_dartachalani/constants.dart';
@@ -10,20 +11,19 @@ import 'package:samata_dartachalani/exportimportJson.dart';
 import 'package:samata_dartachalani/models/chalani.dart';
 import 'package:samata_dartachalani/models/darta.dart';
 import 'package:samata_dartachalani/models/user.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:samata_dartachalani/tauko.dart';
 import 'package:samata_dartachalani/viewAllDartaChalani.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  Directory appDocumentDir;
-  if (Platform.isWindows) {
-    appDocumentDir = await getApplicationDocumentsDirectory();
-  } else {
-    throw UnsupportedError('Unsupported platform');
+  // Directory appDocumentDir;
+  String? selectedDirectory = await FilePicker.platform.getDirectoryPath();
+  if (selectedDirectory == null) {
+    // User canceled the picker
+    return;
   }
 
-  Hive.init(appDocumentDir.path);
+  Hive.init(selectedDirectory);
   Hive.registerAdapter(UserAdapter());
   Hive.registerAdapter(DartaAdapter());
   Hive.registerAdapter(ChalaniAdapter());
@@ -449,101 +449,103 @@ class HomePage extends StatelessWidget {
       body: Align(
         alignment: Alignment.topCenter,
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: <Widget>[
+            SizedBox(height: getheight(context) * 0.04),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.push(context,
+                        MaterialPageRoute(builder: (context) {
+                      return const ViewAllScreen();
+                    }));
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xff108841),
+                    minimumSize: const Size(200, 50),
+                  ),
+                  child: Text('View All Darta Chalanis',
+                      style: gettext(context).titleMedium),
+                ),
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.push(context,
+                        MaterialPageRoute(builder: (context) {
+                      return const CreateDartaScreen();
+                    }));
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xff108841),
+                    minimumSize: const Size(200, 50),
+                  ),
+                  child:
+                      Text('Create Darta', style: gettext(context).titleMedium),
+                ),
+                SizedBox(height: getheight(context) * 0.04),
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) {
+                        return const CreateChalaniScreen();
+                      }),
+                    );
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xff108841),
+                    minimumSize: const Size(200, 50),
+                  ),
+                  child: Text('Create Chalani',
+                      style: gettext(context).titleMedium),
+                ),
+              ],
+            ),
             const Tauko(
-              header: 'Please select your choice',
+              header: 'Darta-Chalani Portal',
             ),
-            SizedBox(height: getheight(context) * 0.04),
-            Expanded(
-              child: ElevatedButton(
-                onPressed: () {
-                  Navigator.push(context, MaterialPageRoute(builder: (context) {
-                    return const ViewAllScreen();
-                  }));
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xff108841),
-                  minimumSize: const Size(200, 50),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                ElevatedButton(
+                  onPressed: () async {
+                    await HiveExportImport.exportData(context);
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xff108841),
+                    minimumSize: const Size(200, 50),
+                  ),
+                  child: Text('Export Database',
+                      style: gettext(context).titleMedium),
                 ),
-                child: Text('View All Darta Chalanis',
-                    style: gettext(context).titleMedium),
-              ),
-            ),
-            SizedBox(height: getheight(context) * 0.04),
-            Expanded(
-              child: ElevatedButton(
-                onPressed: () {
-                  Navigator.push(context, MaterialPageRoute(builder: (context) {
-                    return const CreateDartaScreen();
-                  }));
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xff108841),
-                  minimumSize: const Size(200, 50),
+                SizedBox(height: getheight(context) * 0.04),
+                ElevatedButton(
+                  onPressed: () {
+                    HiveExportImport.importData(context);
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xff108841),
+                    minimumSize: const Size(200, 50),
+                  ),
+                  child: Text('Import Database',
+                      style: gettext(context).titleMedium),
                 ),
-                child:
-                    Text('Create Darta', style: gettext(context).titleMedium),
-              ),
-            ),
-            SizedBox(height: getheight(context) * 0.04),
-            Expanded(
-              child: ElevatedButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) {
-                      return const CreateChalaniScreen();
-                    }),
-                  );
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xff108841),
-                  minimumSize: const Size(200, 50),
+                SizedBox(height: getheight(context) * 0.04),
+                // const Spacer(),
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.red,
+                    minimumSize: const Size(200, 50),
+                  ),
+                  child: const Text('Logout',
+                      style: TextStyle(color: Colors.white)),
+                  onPressed: () {
+                    _logout(context);
+                  },
                 ),
-                child:
-                    Text('Create Chalani', style: gettext(context).titleMedium),
-              ),
-            ),
-            SizedBox(height: getheight(context) * 0.04),
-            Expanded(
-              child: ElevatedButton(
-                onPressed: () async {
-                  await HiveExportImport.exportData(context);
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xff108841),
-                  minimumSize: const Size(200, 50),
-                ),
-                child: Text('Export Database',
-                    style: gettext(context).titleMedium),
-              ),
-            ),
-            SizedBox(height: getheight(context) * 0.04),
-            Expanded(
-              child: ElevatedButton(
-                onPressed: () {
-                  HiveExportImport.importData(context);
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xff108841),
-                  minimumSize: const Size(200, 50),
-                ),
-                child: Text('Import Database',
-                    style: gettext(context).titleMedium),
-              ),
-            ),
-            const Spacer(),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xff108841),
-                minimumSize: const Size(200, 50),
-              ),
-              child: const Text('Logout', style: TextStyle(color: Colors.white)),
-              onPressed: () {
-                _logout(context);
-              },
+              ],
             ),
             SizedBox(height: getheight(context) * 0.04),
             SizedBox(height: getheight(context) * 0.04),

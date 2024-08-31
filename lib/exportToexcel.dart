@@ -37,7 +37,7 @@ class ExportService {
     var cellSn = dartaSheet.cell(
       CellIndex.indexByString('A1'),
     );
-    cellSn.value = TextCellValue('SN');
+    cellSn.value = TextCellValue('Darta Number');
     cellSn.cellStyle = boldStyle;
 //
     var cellDate = dartaSheet.cell(
@@ -99,7 +99,7 @@ class ExportService {
     var cellSnc = chalaniSheet.cell(
       CellIndex.indexByString('A1'),
     );
-    cellSnc.value = TextCellValue('SN');
+    cellSnc.value = TextCellValue('Chalani Number');
     cellSnc.cellStyle = boldStyle;
 //
     var cellDatec = chalaniSheet.cell(
@@ -142,8 +142,8 @@ class ExportService {
         TextCellValue(chalani?.date ?? ''),
         TextCellValue(chalani?.fiscalYear ?? ''),
         TextCellValue(chalani?.outgoingInstitutionName ?? ''),
-        TextCellValue(chalani?.subject ?? ''),
         TextCellValue(chalani?.type ?? ''),
+        TextCellValue(chalani?.subject ?? ''),
         // TextCellValue(chalani?.filePath ?? ''), // Exporting the image path
       ]);
     }

@@ -31,6 +31,7 @@ build/
 .pub-cache/
 .pub/
 /build/
+/installers
 
 # Symbolication related
 app.*.symbols

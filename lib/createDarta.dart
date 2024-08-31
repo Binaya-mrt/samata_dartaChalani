@@ -45,6 +45,12 @@ class _CreateDartaScreenState extends State<CreateDartaScreen> {
     }
   }
 
+  String? _selectedOption;
+  String? _selectedCompany;
+  String? _customCompanyName;
+
+  List<String> _filteredCompanies = [];
+
   void getTodayDate() {
     _selectedNepaliDate = NepaliDateTime.now();
   }
@@ -69,7 +75,7 @@ class _CreateDartaScreenState extends State<CreateDartaScreen> {
   }
 
   void _submitForm() async {
-    if (_formKey.currentState!.validate()) {
+    if (_formKey.currentState!.validate() && _selectedFile != null) {
       try {
         String? documentBase64;
         if (_selectedFile != null) {
@@ -84,13 +90,15 @@ class _CreateDartaScreenState extends State<CreateDartaScreen> {
 
         // Create a new Darta object with the new file path
         final newDarta = Darta(
-          date: _selectedNepaliDate!.toString().split(' ')[0],
-          snNumber: _snController.text,
-          fiscalYear: _selectedFiscalYear!,
-          incomingInstitutionName: _institutionNameController.text,
-          subject: _subjectController.text,
-          imageBase64: documentBase64,
-        );
+            date: _selectedNepaliDate!.toString().split(' ')[0],
+            snNumber: _snController.text,
+            fiscalYear: _selectedFiscalYear!,
+            incomingInstitutionName: _selectedCompany == 'Others'
+                ? _institutionNameController.text
+                : _selectedCompany!,
+            subject: _subjectController.text,
+            imageBase64: documentBase64,
+            type: _selectedOption);
 
         // Save the Darta object in Hive
         Hive.box<Darta>('darta').add(newDarta);
@@ -107,7 +115,10 @@ class _CreateDartaScreenState extends State<CreateDartaScreen> {
       }
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please fill in all the details')),
+        const SnackBar(
+          content: Text('Please fill in all the details'),
+          backgroundColor: Colors.red,
+        ),
       );
     }
   }
@@ -120,15 +131,6 @@ class _CreateDartaScreenState extends State<CreateDartaScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            IconButton(
-              onPressed: () {
-                Navigator.pop(context);
-              },
-              icon: const Icon(
-                Icons.arrow_back_ios,
-                size: 14,
-              ),
-            ),
             Center(
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16.0),
@@ -162,15 +164,19 @@ class _CreateDartaScreenState extends State<CreateDartaScreen> {
                                     child: ListTile(
                                       title: RichText(
                                         text: TextSpan(
-                                          text: 'Date ',
+                                          text: 'Date:  ',
                                           style: const TextStyle(
                                               fontSize: 16,
                                               fontWeight: FontWeight.w600,
-                                              color: Colors.black),
+                                              color: Colors.red),
                                           children: <TextSpan>[
                                             TextSpan(
-                                                text:
-                                                    _selectedNepaliDate != null ? NepaliDateFormat.yMMMMd().format(_selectedNepaliDate!) : 'Select Date',
+                                                text: _selectedNepaliDate !=
+                                                        null
+                                                    ? NepaliDateFormat.yMMMMd()
+                                                        .format(
+                                                            _selectedNepaliDate!)
+                                                    : 'Select Date',
                                                 style: const TextStyle(
                                                     fontWeight: FontWeight.w400,
                                                     fontSize: 16,
@@ -206,7 +212,7 @@ class _CreateDartaScreenState extends State<CreateDartaScreen> {
                                         style: TextStyle(
                                             fontSize: 16,
                                             fontWeight: FontWeight.w600,
-                                            color: Colors.black),
+                                            color: Colors.red),
                                       ),
                                       const SizedBox(
                                         width: 3,
@@ -220,9 +226,9 @@ class _CreateDartaScreenState extends State<CreateDartaScreen> {
                                             decoration: const InputDecoration(
                                               contentPadding: EdgeInsets.only(
                                                   bottom: 10, left: 5),
-                                              border: OutlineInputBorder(),
-                                              focusedBorder:
-                                                  OutlineInputBorder(),
+                                              // border: OutlineInputBorder(),
+                                              // focusedBorder:
+                                              //     OutlineInputBorder(),
                                             ),
                                             style: const TextStyle(
                                               fontSize: 14,
@@ -252,74 +258,142 @@ class _CreateDartaScreenState extends State<CreateDartaScreen> {
                                       ],
                                     ),
                                     SizedBox(height: getheight(context) * 0.02),
-                                    const Text(
-                                      'Select Fiscal Year',
-                                      style: TextStyle(
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.w600,
-                                          color: Colors.black),
+                                    Row(
+                                      children: [
+                                        const Text(
+                                          'Select Fiscal Year',
+                                          style: TextStyle(
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.w600,
+                                              color: Colors.red),
+                                        ),
+                                        SizedBox(
+                                            width: getheight(context) * 0.11),
+                                        SizedBox(
+                                          width: getwidth(context) / 8,
+                                          child:
+                                              DropdownButtonFormField<String>(
+                                            hint: const Text(
+                                                'Choose fiscal year'),
+                                            value: _selectedFiscalYear,
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .bodyMedium,
+                                            items: fiscalYears
+                                                .map((year) => DropdownMenuItem(
+                                                    value: year,
+                                                    child: Text(year)))
+                                                .toList(),
+                                            onChanged: (value) {
+                                              setState(() {
+                                                _selectedFiscalYear = value!;
+                                              });
+                                            },
+                                            validator: (value) => value == null
+                                                ? 'Select a fiscal year'
+                                                : null,
+                                          ),
+                                        ),
+                                      ],
                                     ),
                                     SizedBox(height: getheight(context) * 0.02),
-                                    SizedBox(
-                                      width: getwidth(context) / 3,
-                                      child: DropdownButtonFormField<String>(
-                                        hint: const Text('Choose fiscal year'),
-                                        value: _selectedFiscalYear,
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .bodyMedium,
-                                        items: fiscalYears
-                                            .map((year) => DropdownMenuItem(
-                                                value: year, child: Text(year)))
-                                            .toList(),
-                                        onChanged: (value) {
+                                    Row(
+                                      children: [
+                                        const Text(
+                                          'Institution Type ',
+                                          style: TextStyle(
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.w600,
+                                              color: Colors.red),
+                                        ),
+                                        SizedBox(
+                                          width: getwidth(context) * 0.07,
+                                        ),
+                                        DropdownButton<String>(
+                                          style: inside,
+                                          hint: const Text('Select One',
+                                              style: inside),
+                                          value: _selectedOption,
+                                          onChanged: (newValue) {
+                                            setState(() {
+                                              _selectedOption = newValue;
+                                              _filteredCompanies =
+                                                  companyOptions[newValue] ??
+                                                      [];
+
+                                              if (newValue == 'Internal') {
+                                                _selectedCompany = 'Samata';
+                                              } else {
+                                                _selectedCompany = null;
+                                                _customCompanyName =
+                                                    null; // Reset custom company name
+                                              }
+                                            });
+                                          },
+                                          items:
+                                              companyOptions.keys.map((option) {
+                                            return DropdownMenuItem<String>(
+                                              value: option,
+                                              child: Text(option),
+                                            );
+                                          }).toList(),
+                                        ),
+                                      ],
+                                    ),
+                                    const Text('Incoming Institution',
+                                        style: title),
+                                    if (_selectedOption == 'Internal') ...[
+                                      const Text('Samata', style: inside),
+                                    ] else ...[
+                                      DropdownButton<String>(
+                                        hint: const Text('Select company',
+                                            style: inside),
+                                        value: _selectedCompany,
+                                        onChanged: (newValue) {
                                           setState(() {
-                                            _selectedFiscalYear = value!;
+                                            _selectedCompany = newValue;
+                                            _customCompanyName =
+                                                null; // Reset custom company name when a new company is selected
                                           });
                                         },
-                                        validator: (value) => value == null
-                                            ? 'Select a fiscal year'
-                                            : null,
+                                        items:
+                                            _filteredCompanies.map((company) {
+                                          return DropdownMenuItem<String>(
+                                            value: company,
+                                            child: Text(company, style: inside),
+                                          );
+                                        }).toList(),
                                       ),
-                                    ),
-                                    SizedBox(height: getheight(context) * 0.02),
-                                    const Text(
-                                      'Incoming Institutions:-',
-                                      style: TextStyle(
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.w600,
-                                          color: Colors.black),
-                                    ),
-                                    ListTile(
-                                      subtitle: TextFormField(
-                                        decoration: const InputDecoration(
-                                            border: OutlineInputBorder(),
-                                            focusedBorder:
-                                                OutlineInputBorder()),
-                                        style: const TextStyle(
-                                            fontSize: 14,
-                                            fontWeight: FontWeight.w400,
-                                            color: Colors.black),
+                                    ],
+                                    const SizedBox(height: 20),
+                                    if (_selectedCompany == 'Others') ...[
+                                      TextField(
                                         controller: _institutionNameController,
-                                        validator: (value) => value!.isEmpty
-                                            ? 'Enter institution name'
-                                            : null,
+                                        style: inside,
+                                        decoration: const InputDecoration(
+                                          hintText: 'Enter company name',
+                                          hintStyle: inside,
+                                        ),
+                                        onChanged: (value) {
+                                          setState(() {
+                                            _customCompanyName = value;
+                                          });
+                                        },
                                       ),
-                                    ),
-                                    SizedBox(height: getheight(context) * 0.02),
+                                    ],
                                     const Text(
-                                      'Enter Subject:-',
+                                      'Enter Subject',
                                       style: TextStyle(
                                           fontSize: 16,
                                           fontWeight: FontWeight.w600,
-                                          color: Colors.black),
+                                          color: Colors.red),
                                     ),
-                                    ListTile(
-                                      subtitle: TextFormField(
+                                    SizedBox(
+                                      height: 35,
+                                      child: TextFormField(
                                         decoration: const InputDecoration(
-                                            border: OutlineInputBorder(),
-                                            focusedBorder:
-                                                OutlineInputBorder()),
+                                            contentPadding: EdgeInsets.only(
+                                                bottom: 10, left: 5)),
                                         style: const TextStyle(
                                             fontSize: 14,
                                             fontWeight: FontWeight.w400,
@@ -330,61 +404,87 @@ class _CreateDartaScreenState extends State<CreateDartaScreen> {
                                             : null,
                                       ),
                                     ),
-                                    SizedBox(height: getheight(context) * 0.04),
-                                    _selectedFile != null
-                                        ? _selectedFile!.path.endsWith('.pdf')
-                                            ? Text(
-                                                'Selected PDF: ${_selectedFile!.path.split('/').last}')
-                                            : Image.file(
-                                                _selectedFile!,
-                                                height: 100,
-                                                width: 150,
-                                              )
-                                        : GestureDetector(
-                                            onTap: _pickFile,
-                                            child: Column(
-                                              children: [
-                                                Container(
-                                                  height: 100,
-                                                  width: 150,
-                                                  decoration: BoxDecoration(
-                                                    color: Colors.grey[300],
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            8),
-                                                  ),
-                                                  child: const Icon(
-                                                    Icons.upload,
-                                                    color: Color(0xff108841),
-                                                  ),
+                                    SizedBox(height: getheight(context) * 0.02),
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceAround,
+                                      children: [
+                                        _selectedFile != null
+                                            ? _selectedFile!.path
+                                                    .endsWith('.pdf')
+                                                ? Text(
+                                                    'Selected PDF: ${_selectedFile!.path.split('/').last}')
+                                                : Image.file(
+                                                    _selectedFile!,
+                                                    height: 100,
+                                                    width: 150,
+                                                  )
+                                            : GestureDetector(
+                                                onTap: _pickFile,
+                                                child: Column(
+                                                  children: [
+                                                    Container(
+                                                      height: 50,
+                                                      width: 50,
+                                                      decoration: BoxDecoration(
+                                                        color: Colors.grey[300],
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(8),
+                                                      ),
+                                                      child: const Icon(
+                                                        Icons.upload,
+                                                        color:
+                                                            Color(0xff108841),
+                                                      ),
+                                                    ),
+                                                    const Text(
+                                                      'Upload Document',
+                                                      style: TextStyle(
+                                                          color:
+                                                              Color(0xff108841),
+                                                          fontWeight:
+                                                              FontWeight.w600,
+                                                          fontSize: 14),
+                                                    ),
+                                                  ],
                                                 ),
-                                                const Text(
-                                                  'Upload Document',
-                                                  style: TextStyle(
-                                                      color: Color(0xff108841),
-                                                      fontWeight:
-                                                          FontWeight.w600,
-                                                      fontSize: 14),
-                                                ),
-                                              ],
+                                              ),
+                                        ElevatedButton(
+                                          onPressed: () {
+                                            Navigator.pop(context);
+                                          },
+                                          style: ElevatedButton.styleFrom(
+                                            backgroundColor: Colors.red,
+                                          ),
+                                          child: const Padding(
+                                            padding: EdgeInsets.symmetric(
+                                                horizontal: 30.0, vertical: 8),
+                                            child: Text(
+                                              'Back',
+                                              style: TextStyle(
+                                                  color: Colors.white),
                                             ),
                                           ),
-                                    const SizedBox(height: 20),
-                                    ElevatedButton(
-                                      onPressed: _submitForm,
-                                      style: ElevatedButton.styleFrom(
-                                        backgroundColor:
-                                            const Color(0xff108841),
-                                      ),
-                                      child: const Padding(
-                                        padding: EdgeInsets.symmetric(
-                                            horizontal: 30.0, vertical: 8),
-                                        child: Text(
-                                          'Submit',
-                                          style: TextStyle(color: Colors.white),
                                         ),
-                                      ),
-                                    ),
+                                        ElevatedButton(
+                                          onPressed: _submitForm,
+                                          style: ElevatedButton.styleFrom(
+                                            backgroundColor:
+                                                const Color(0xff108841),
+                                          ),
+                                          child: const Padding(
+                                            padding: EdgeInsets.symmetric(
+                                                horizontal: 30.0, vertical: 8),
+                                            child: Text(
+                                              'Submit',
+                                              style: TextStyle(
+                                                  color: Colors.white),
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    )
                                   ],
                                 ),
                               ),

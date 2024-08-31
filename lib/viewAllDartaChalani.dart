@@ -82,13 +82,15 @@ class _ViewAllScreenState extends State<ViewAllScreen> {
       children: [
         _buildFilterSection(isDarta),
         Expanded(
-          child: ListView.builder(
-            itemCount: dataList.length,
-            itemBuilder: (context, index) {
-              final item = dataList[index];
-              return _buildDataCard(item, isDarta);
-            },
-          ),
+          child: dataList.isEmpty
+              ? const Center(child: Text('No data available'))
+              : ListView.builder(
+                  itemCount: dataList.length,
+                  itemBuilder: (context, index) {
+                    final item = dataList[index];
+                    return _buildDataCard(item, isDarta);
+                  },
+                ),
         ),
       ],
     );
