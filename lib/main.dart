@@ -49,7 +49,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         textTheme: const TextTheme(
           headlineLarge: TextStyle(
-              fontSize: 30,
+              fontSize: 24,
               fontWeight: FontWeight.w600,
               color: Color(0xff0D0D0D)),
           headlineMedium: TextStyle(
@@ -119,7 +119,7 @@ class _LoginPageState extends State<LoginPage> {
           alignment: Alignment.topCenter,
           child: Column(
             children: [
-              Tauko(
+              const Tauko(
                 header: 'Login',
               ),
               Container(
@@ -276,7 +276,7 @@ class _SignupPageState extends State<SignupPage> {
           alignment: Alignment.topCenter,
           child: Column(
             children: [
-              Tauko(
+              const Tauko(
                 header: '',
               ),
               Container(
@@ -450,86 +450,103 @@ class HomePage extends StatelessWidget {
         alignment: Alignment.topCenter,
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: <Widget>[
-            Tauko(
+            const Tauko(
               header: 'Please select your choice',
             ),
-Row(children:[
-  
-  ElevatedButton(
-              onPressed: () {
-                Navigator.push(context, MaterialPageRoute(builder: (context) {
-                  return ViewAllScreen();
-                }));
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xff108841),
-                minimumSize: const Size(200, 50),
+            SizedBox(height: getheight(context) * 0.04),
+            Expanded(
+              child: ElevatedButton(
+                onPressed: () {
+                  Navigator.push(context, MaterialPageRoute(builder: (context) {
+                    return const ViewAllScreen();
+                  }));
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xff108841),
+                  minimumSize: const Size(200, 50),
+                ),
+                child: Text('View All Darta Chalanis',
+                    style: gettext(context).titleMedium),
               ),
-              child: Text('View All Darta Chalanis',
-                  style: gettext(context).titleMedium),
             ),
             SizedBox(height: getheight(context) * 0.04),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.push(context, MaterialPageRoute(builder: (context) {
-                  return const CreateDartaScreen();
-                }));
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xff108841),
-                minimumSize: const Size(200, 50),
+            Expanded(
+              child: ElevatedButton(
+                onPressed: () {
+                  Navigator.push(context, MaterialPageRoute(builder: (context) {
+                    return const CreateDartaScreen();
+                  }));
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xff108841),
+                  minimumSize: const Size(200, 50),
+                ),
+                child:
+                    Text('Create Darta', style: gettext(context).titleMedium),
               ),
-              child: Text('Create Darta', style: gettext(context).titleMedium),
             ),
             SizedBox(height: getheight(context) * 0.04),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) {
-                    return const CreateChalaniScreen();
-                  }),
-                );
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xff108841),
-                minimumSize: const Size(200, 50),
+            Expanded(
+              child: ElevatedButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) {
+                      return const CreateChalaniScreen();
+                    }),
+                  );
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xff108841),
+                  minimumSize: const Size(200, 50),
+                ),
+                child:
+                    Text('Create Chalani', style: gettext(context).titleMedium),
               ),
-              child:
-                  Text('Create Chalani', style: gettext(context).titleMedium),
             ),
-            ElevatedButton(
-              onPressed: () async {
-                await HiveExportImport.exportData(context);
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xff108841),
-                minimumSize: const Size(200, 50),
+            SizedBox(height: getheight(context) * 0.04),
+            Expanded(
+              child: ElevatedButton(
+                onPressed: () async {
+                  await HiveExportImport.exportData(context);
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xff108841),
+                  minimumSize: const Size(200, 50),
+                ),
+                child: Text('Export Database',
+                    style: gettext(context).titleMedium),
               ),
-              child:
-                  Text('Export Database', style: gettext(context).titleMedium),
             ),
+            SizedBox(height: getheight(context) * 0.04),
+            Expanded(
+              child: ElevatedButton(
+                onPressed: () {
+                  HiveExportImport.importData(context);
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xff108841),
+                  minimumSize: const Size(200, 50),
+                ),
+                child: Text('Import Database',
+                    style: gettext(context).titleMedium),
+              ),
+            ),
+            const Spacer(),
             ElevatedButton(
-              onPressed: () {
-                HiveExportImport.importData(context);
-              },
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xff108841),
                 minimumSize: const Size(200, 50),
               ),
-              child:
-                  Text('Import Database', style: gettext(context).titleMedium),
-            ),]),
-            
-            SizedBox(height: getheight(context) * 0.04),
-            SizedBox(height: getheight(context) * 0.04),
-            TextButton(
-              child: Text('Logout', style: gettext(context).bodyLarge),
+              child: const Text('Logout', style: TextStyle(color: Colors.white)),
               onPressed: () {
                 _logout(context);
               },
             ),
+            SizedBox(height: getheight(context) * 0.04),
+            SizedBox(height: getheight(context) * 0.04),
           ],
         ),
       ),

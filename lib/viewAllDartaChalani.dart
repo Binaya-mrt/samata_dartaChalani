@@ -13,7 +13,7 @@ import 'dart:developer';
 import 'models/chalani.dart';
 
 class ViewAllScreen extends StatefulWidget {
-  const ViewAllScreen({Key? key}) : super(key: key);
+  const ViewAllScreen({super.key});
 
   @override
   _ViewAllScreenState createState() => _ViewAllScreenState();
@@ -59,7 +59,7 @@ class _ViewAllScreenState extends State<ViewAllScreen> {
                       style: TextStyle(color: Colors.white)),
                   onPressed: () => ExportService().exportToExcel(context),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Color(0xff108841),
+                    backgroundColor: const Color(0xff108841),
                     padding: const EdgeInsets.symmetric(horizontal: 16),
                   ),
                 ),
@@ -131,7 +131,7 @@ class _ViewAllScreenState extends State<ViewAllScreen> {
                       _startDate == null
                           ? 'Select Start Date'
                           : 'Start: ${_formatNepaliDate(_startDate!)}',
-                      style: TextStyle(
+                      style: const TextStyle(
                           color: Color(0xff108841),
                           fontWeight: FontWeight.w500,
                           fontSize: 14),
@@ -145,7 +145,7 @@ class _ViewAllScreenState extends State<ViewAllScreen> {
                       _endDate == null
                           ? 'Select End Date'
                           : 'End: ${_formatNepaliDate(_endDate!)}',
-                      style: TextStyle(
+                      style: const TextStyle(
                           color: Color(0xff108841),
                           fontWeight: FontWeight.w500,
                           fontSize: 14),
@@ -156,7 +156,7 @@ class _ViewAllScreenState extends State<ViewAllScreen> {
               const SizedBox(height: 16),
               DropdownButtonFormField<String>(
                 hint: const Text('Select Fiscal Year'),
-                style: TextStyle(
+                style: const TextStyle(
                     color: Color(0xff108841),
                     fontWeight: FontWeight.w500,
                     fontSize: 14),
@@ -207,13 +207,13 @@ class _ViewAllScreenState extends State<ViewAllScreen> {
               children: [
                 ElevatedButton(
                   onPressed: () => _viewFile(item.imageBase64),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xff108841),
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                  ),
                   child: const Text(
                     'View Document',
                     style: TextStyle(color: Colors.white),
-                  ),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Color(0xff108841),
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
                   ),
                 ),
                 const SizedBox(width: 8),
@@ -224,13 +224,13 @@ class _ViewAllScreenState extends State<ViewAllScreen> {
                           ? '${item.incomingInstitutionName}_${item.date}'
                           : '${item.outgoingInstitutionName}_${item.date}',
                       context),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xff108841),
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                  ),
                   child: const Text(
                     'Download Document',
                     style: TextStyle(color: Colors.white),
-                  ),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Color(0xff108841),
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
                   ),
                 ),
               ],
@@ -260,7 +260,7 @@ class _ViewAllScreenState extends State<ViewAllScreen> {
                   ? InteractiveViewer(
                       child: Image.memory(bytes),
                     )
-                  : Center(child: Text('Unsupported file type')),
+                  : const Center(child: Text('Unsupported file type')),
         );
       },
     );
@@ -284,7 +284,7 @@ class _ViewAllScreenState extends State<ViewAllScreen> {
         extension = '.pdf';
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Unsupported file type')),
+          const SnackBar(content: Text('Unsupported file type')),
         );
         return;
       }

@@ -3,14 +3,13 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:mime/mime.dart';
 import 'package:nepali_date_picker/nepali_date_picker.dart';
-import 'package:nepali_utils/nepali_utils.dart'; // For Nepali date formatting
+// For Nepali date formatting
 import 'dart:io';
 import 'package:file_picker/file_picker.dart';
 import 'package:hive/hive.dart';
 import 'package:samata_dartachalani/constants.dart';
 import 'package:samata_dartachalani/tauko.dart';
 import 'models/chalani.dart';
-import 'package:path/path.dart' as path;
 
 class CreateChalaniScreen extends StatefulWidget {
   const CreateChalaniScreen({super.key});
@@ -36,7 +35,7 @@ class _CreateChalaniScreenState extends State<CreateChalaniScreen> {
     super.initState();
     _initializeSN();
     getTodayDate();
-    _snController.value = TextEditingValue(text: _snNumber.toString() + " ");
+    _snController.value = TextEditingValue(text: "$_snNumber ");
   }
 
   void _initializeSN() {
@@ -77,7 +76,7 @@ class _CreateChalaniScreenState extends State<CreateChalaniScreen> {
           final bytes = await _selectedFile!.readAsBytes();
           final mimeType = lookupMimeType(_selectedFile!.path);
           if (mimeType != null) {
-            documentBase64 = 'data:$mimeType;base64,' + base64Encode(bytes);
+            documentBase64 = 'data:$mimeType;base64,${base64Encode(bytes)}';
           } else {
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(
@@ -90,12 +89,13 @@ class _CreateChalaniScreenState extends State<CreateChalaniScreen> {
         }
 
         final newChalani = Chalani(
-            date: _selectedNepaliDate!.toString().split(' ')[0],
-            snNumber: _snController.text,
-            fiscalYear: _selectedFiscalYear!,
-            outgoingInstitutionName: _institutionNameController.text,
-            subject: _subjectController.text,
-            imageBase64: documentBase64);
+          date: _selectedNepaliDate!.toString().split(' ')[0],
+          snNumber: _snController.text,
+          fiscalYear: _selectedFiscalYear!,
+          outgoingInstitutionName: _institutionNameController.text,
+          subject: _subjectController.text,
+          imageBase64: documentBase64,
+        );
 
         Hive.box<Chalani>('chalani').add(newChalani);
 
@@ -149,7 +149,7 @@ class _CreateChalaniScreenState extends State<CreateChalaniScreen> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: <Widget>[
-                    Tauko(
+                    const Tauko(
                       header: 'Chalani',
                     ),
                     Container(
@@ -175,8 +175,10 @@ class _CreateChalaniScreenState extends State<CreateChalaniScreen> {
                                         color: Colors.black),
                                     children: <TextSpan>[
                                       TextSpan(
-                                          text:
-                                              '${_selectedNepaliDate != null ? NepaliDateFormat.yMMMMd().format(_selectedNepaliDate!) : 'Select Date'}',
+                                          text: _selectedNepaliDate != null
+                                              ? NepaliDateFormat.yMMMMd()
+                                                  .format(_selectedNepaliDate!)
+                                              : 'Select Date',
                                           style: const TextStyle(
                                               fontWeight: FontWeight.w400,
                                               fontSize: 16,
@@ -253,7 +255,7 @@ class _CreateChalaniScreenState extends State<CreateChalaniScreen> {
                                     SizedBox(
                                       width: getwidth(context) / 3,
                                       child: DropdownButtonFormField<String>(
-                                        hint: Text('Choose fiscal year'),
+                                        hint: const Text('Choose fiscal year'),
                                         value: _selectedFiscalYear,
                                         style: Theme.of(context)
                                             .textTheme
@@ -362,6 +364,10 @@ class _CreateChalaniScreenState extends State<CreateChalaniScreen> {
                                     const SizedBox(height: 20),
                                     ElevatedButton(
                                       onPressed: _submitForm,
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor:
+                                            const Color(0xff108841),
+                                      ),
                                       child: const Padding(
                                         padding: EdgeInsets.symmetric(
                                             horizontal: 30.0, vertical: 8),
@@ -369,10 +375,6 @@ class _CreateChalaniScreenState extends State<CreateChalaniScreen> {
                                           'Submit',
                                           style: TextStyle(color: Colors.white),
                                         ),
-                                      ),
-                                      style: ElevatedButton.styleFrom(
-                                        backgroundColor:
-                                            const Color(0xff108841),
                                       ),
                                     ),
                                   ],

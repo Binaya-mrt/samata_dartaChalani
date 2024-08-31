@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:samata_dartachalani/models/chalani.dart';
 import 'package:samata_dartachalani/models/darta.dart';
@@ -56,15 +55,10 @@ class HiveExportImport {
             (d) => d.snNumber == importedDarta.snNumber,
           );
 
-          if (existingDarta != null) {
-            // Update existing entry
-            final index = dartaBox.values.toList().indexOf(existingDarta);
-            await dartaBox.putAt(index, importedDarta);
-          } else {
-            // Add new entry
-            await dartaBox.add(importedDarta);
-          }
-        }
+          // Update existing entry
+          final index = dartaBox.values.toList().indexOf(existingDarta);
+          await dartaBox.putAt(index, importedDarta);
+                }
 
         // Import data to chalaniBox
         final chalaniData = allData['chalani'] as List<dynamic>;
@@ -74,24 +68,19 @@ class HiveExportImport {
             (c) => c.snNumber == importedChalani.snNumber,
           );
 
-          if (existingChalani != null) {
-            // Update existing entry
-            final index = chalaniBox.values.toList().indexOf(existingChalani);
-            await chalaniBox.putAt(index, importedChalani);
-          } else {
-            // Add new entry
-            await chalaniBox.add(importedChalani);
-          }
-        }
+          // Update existing entry
+          final index = chalaniBox.values.toList().indexOf(existingChalani);
+          await chalaniBox.putAt(index, importedChalani);
+                }
 // show snackabr
 
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Data imported successfully')),
+          const SnackBar(content: Text('Data imported successfully')),
         );
       }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
+        const SnackBar(
           content: Text('Error Importing data'),
           backgroundColor: Colors.red,
         ),

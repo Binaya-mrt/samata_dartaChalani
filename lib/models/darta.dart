@@ -22,14 +22,17 @@ class Darta extends HiveObject {
   @HiveField(5)
   String? imageBase64; // Store the image as a base64 string
 
-  Darta({
-    required this.date,
-    required this.snNumber,
-    required this.fiscalYear,
-    required this.incomingInstitutionName,
-    required this.subject,
-    this.imageBase64,
-  });
+  @HiveField(6)
+  String? type;
+
+  Darta(
+      {required this.date,
+      required this.snNumber,
+      required this.fiscalYear,
+      required this.incomingInstitutionName,
+      required this.subject,
+      this.imageBase64,
+      this.type});
   Map<String, dynamic> toJson() {
     return {
       'snNumber': snNumber,
@@ -38,6 +41,7 @@ class Darta extends HiveObject {
       'subject': subject,
       'incomingInstitutionName': incomingInstitutionName,
       'imageBase64': imageBase64,
+      'type': type
     };
   }
 
@@ -49,6 +53,7 @@ class Darta extends HiveObject {
       incomingInstitutionName: json['incomingInstitutionName'],
       subject: json['subject'],
       imageBase64: json['imageBase64'],
+      type: json['type'],
     );
   }
 }

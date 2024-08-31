@@ -5,14 +5,11 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:mime/mime.dart';
-import 'package:nepali_utils/nepali_utils.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:samata_dartachalani/constants.dart';
 import 'package:samata_dartachalani/tauko.dart';
 import 'dart:io';
 import 'models/darta.dart';
 import 'package:nepali_date_picker/nepali_date_picker.dart';
-import 'package:path/path.dart' as path;
 
 class CreateDartaScreen extends StatefulWidget {
   const CreateDartaScreen({super.key});
@@ -38,7 +35,7 @@ class _CreateDartaScreenState extends State<CreateDartaScreen> {
     super.initState();
     _initializeSN();
     getTodayDate();
-    _snController.value = TextEditingValue(text: _snNumber.toString() + " ");
+    _snController.value = TextEditingValue(text: "$_snNumber ");
   }
 
   void _initializeSN() {
@@ -79,16 +76,11 @@ class _CreateDartaScreenState extends State<CreateDartaScreen> {
           final bytes = await _selectedFile!.readAsBytes();
           final mimeType = lookupMimeType(_selectedFile!.path);
           if (mimeType != null) {
-            documentBase64 = 'data:$mimeType;base64,' + base64Encode(bytes);
+            documentBase64 = 'data:$mimeType;base64,${base64Encode(bytes)}';
           } else {
             log('Unsupported file type');
           }
         }
-        // TODO: excel formating width, bold title, table done
-
-        // TODO: Design on text form fields
-
-        // TODO: Migrations
 
         // Create a new Darta object with the new file path
         final newDarta = Darta(
@@ -144,12 +136,13 @@ class _CreateDartaScreenState extends State<CreateDartaScreen> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: <Widget>[
-                    Tauko(
+                    const Tauko(
                       header: 'Darta',
                     ),
                     Container(
                       width: getwidth(context) / 1.5,
                       decoration: BoxDecoration(
+                        color: Colors.white,
                         borderRadius: BorderRadius.circular(12),
                         border: Border.all(color: const Color(0xff108841)),
                       ),
@@ -160,66 +153,73 @@ class _CreateDartaScreenState extends State<CreateDartaScreen> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              ListTile(
-                                title: RichText(
-                                  text: TextSpan(
-                                    text: 'Date ',
-                                    style: const TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w600,
-                                        color: Colors.black),
-                                    children: <TextSpan>[
-                                      TextSpan(
-                                          text:
-                                              '${_selectedNepaliDate != null ? NepaliDateFormat.yMMMMd().format(_selectedNepaliDate!) : 'Select Date'}',
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  SizedBox(
+                                    width: getwidth(context) / 4,
+                                    child: ListTile(
+                                      title: RichText(
+                                        text: TextSpan(
+                                          text: 'Date ',
                                           style: const TextStyle(
-                                              fontWeight: FontWeight.w400,
-                                              fontSize: 16,
-                                              color: Colors.black)),
-                                    ],
-                                  ),
-                                ),
-                                trailing: const Icon(Icons.calendar_today),
-                                onTap: () async {
-                                  NepaliDateTime? picked =
-                                      await showAdaptiveDatePicker(
-                                    context: context,
-                                    initialDate: NepaliDateTime.now(),
-                                    firstDate: NepaliDateTime(2000),
-                                    lastDate: NepaliDateTime(2100),
-                                    initialDatePickerMode: DatePickerMode.day,
-                                  );
-                                  if (picked != null &&
-                                      picked != _selectedNepaliDate) {
-                                    setState(() {
-                                      _selectedNepaliDate = picked;
-                                    });
-                                  }
-                                },
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.all(16.0),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Row(
-                                      children: [
-                                        const Text(
-                                          'Darta Number: ',
-                                          style: TextStyle(
                                               fontSize: 16,
                                               fontWeight: FontWeight.w600,
                                               color: Colors.black),
+                                          children: <TextSpan>[
+                                            TextSpan(
+                                                text:
+                                                    _selectedNepaliDate != null ? NepaliDateFormat.yMMMMd().format(_selectedNepaliDate!) : 'Select Date',
+                                                style: const TextStyle(
+                                                    fontWeight: FontWeight.w400,
+                                                    fontSize: 16,
+                                                    color: Colors.black)),
+                                          ],
                                         ),
-                                        const SizedBox(
-                                          width: 3,
-                                        ),
-                                        SizedBox(
-                                          width: 100,
-                                          height: 40,
+                                      ),
+                                      trailing:
+                                          const Icon(Icons.calendar_today),
+                                      onTap: () async {
+                                        NepaliDateTime? picked =
+                                            await showAdaptiveDatePicker(
+                                          context: context,
+                                          initialDate: NepaliDateTime.now(),
+                                          firstDate: NepaliDateTime(2000),
+                                          lastDate: NepaliDateTime(2100),
+                                          initialDatePickerMode:
+                                              DatePickerMode.day,
+                                        );
+                                        if (picked != null &&
+                                            picked != _selectedNepaliDate) {
+                                          setState(() {
+                                            _selectedNepaliDate = picked;
+                                          });
+                                        }
+                                      },
+                                    ),
+                                  ),
+                                  Row(
+                                    children: [
+                                      const Text(
+                                        'Darta Number: ',
+                                        style: TextStyle(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.w600,
+                                            color: Colors.black),
+                                      ),
+                                      const SizedBox(
+                                        width: 3,
+                                      ),
+                                      SizedBox(
+                                        width: 70,
+                                        height: 30,
+                                        child: Center(
                                           child: TextFormField(
                                             controller: _snController,
                                             decoration: const InputDecoration(
+                                              contentPadding: EdgeInsets.only(
+                                                  bottom: 10, left: 5),
                                               border: OutlineInputBorder(),
                                               focusedBorder:
                                                   OutlineInputBorder(),
@@ -233,6 +233,21 @@ class _CreateDartaScreenState extends State<CreateDartaScreen> {
                                                 ? 'Enter subject'
                                                 : null,
                                           ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.all(16.0),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    const Row(
+                                      children: [
+                                        Column(
+                                          children: [],
                                         ),
                                       ],
                                     ),
@@ -248,7 +263,7 @@ class _CreateDartaScreenState extends State<CreateDartaScreen> {
                                     SizedBox(
                                       width: getwidth(context) / 3,
                                       child: DropdownButtonFormField<String>(
-                                        hint: Text('Choose fiscal year'),
+                                        hint: const Text('Choose fiscal year'),
                                         value: _selectedFiscalYear,
                                         style: Theme.of(context)
                                             .textTheme
@@ -269,7 +284,7 @@ class _CreateDartaScreenState extends State<CreateDartaScreen> {
                                     ),
                                     SizedBox(height: getheight(context) * 0.02),
                                     const Text(
-                                      'Incomming Institutions:-',
+                                      'Incoming Institutions:-',
                                       style: TextStyle(
                                           fontSize: 16,
                                           fontWeight: FontWeight.w600,
@@ -357,6 +372,10 @@ class _CreateDartaScreenState extends State<CreateDartaScreen> {
                                     const SizedBox(height: 20),
                                     ElevatedButton(
                                       onPressed: _submitForm,
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor:
+                                            const Color(0xff108841),
+                                      ),
                                       child: const Padding(
                                         padding: EdgeInsets.symmetric(
                                             horizontal: 30.0, vertical: 8),
@@ -364,10 +383,6 @@ class _CreateDartaScreenState extends State<CreateDartaScreen> {
                                           'Submit',
                                           style: TextStyle(color: Colors.white),
                                         ),
-                                      ),
-                                      style: ElevatedButton.styleFrom(
-                                        backgroundColor:
-                                            const Color(0xff108841),
                                       ),
                                     ),
                                   ],

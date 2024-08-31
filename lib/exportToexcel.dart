@@ -1,12 +1,9 @@
-import 'dart:ffi';
 import 'dart:io';
 
 import 'package:excel/excel.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
-import 'package:path/path.dart';
-import 'package:samata_dartachalani/constants.dart';
 import 'models/darta.dart';
 import 'models/chalani.dart';
 
@@ -62,17 +59,17 @@ class ExportService {
     cellname.value = TextCellValue('Incoming Institution Name');
     cellname.cellStyle = boldStyle;
 //
-    var cellSubject = dartaSheet.cell(
+    var cellPath = dartaSheet.cell(
       CellIndex.indexByString('E1'),
+    );
+    cellPath.value = TextCellValue('Type');
+    cellPath.cellStyle = boldStyle;
+//
+    var cellSubject = dartaSheet.cell(
+      CellIndex.indexByString('F1'),
     );
     cellSubject.value = TextCellValue('Subject');
     cellSubject.cellStyle = boldStyle;
-//
-    // var cellPath = dartaSheet.cell(
-    //   CellIndex.indexByString('F1'),
-    // );
-    // cellPath.value = TextCellValue('Path');
-    // cellPath.cellStyle = boldStyle;
 //
 
     for (var i = 0; i < dartaBox.length; i++) {
@@ -82,8 +79,8 @@ class ExportService {
         TextCellValue(darta?.date ?? ''),
         TextCellValue(darta?.fiscalYear ?? ''),
         TextCellValue(darta?.incomingInstitutionName ?? ''),
+        TextCellValue(darta?.type ?? ''), // Exporting the image path
         TextCellValue(darta?.subject ?? ''),
-        // TextCellValue(darta?.filePath ?? ''), // Exporting the image path
       ]);
     }
 
@@ -124,18 +121,19 @@ class ExportService {
     cellnamec.value = TextCellValue('Outgoing Institution Name');
     cellnamec.cellStyle = boldStyle;
 //
-    var cellSubjectc = chalaniSheet.cell(
+
+    var cellPathc = chalaniSheet.cell(
       CellIndex.indexByString('E1'),
+    );
+    cellPathc.value = TextCellValue('Type');
+    cellPathc.cellStyle = boldStyle;
+// //
+
+    var cellSubjectc = chalaniSheet.cell(
+      CellIndex.indexByString('F1'),
     );
     cellSubjectc.value = TextCellValue('Subject');
     cellSubjectc.cellStyle = boldStyle;
-//
-//     var cellPathc = chalaniSheet.cell(
-//       CellIndex.indexByString('F1'),
-//     );
-//     cellPathc.value = TextCellValue('Path');
-//     cellPathc.cellStyle = boldStyle;
-// //
 
     for (var i = 0; i < chalaniBox.length; i++) {
       final chalani = chalaniBox.getAt(i);
@@ -145,6 +143,7 @@ class ExportService {
         TextCellValue(chalani?.fiscalYear ?? ''),
         TextCellValue(chalani?.outgoingInstitutionName ?? ''),
         TextCellValue(chalani?.subject ?? ''),
+        TextCellValue(chalani?.type ?? ''),
         // TextCellValue(chalani?.filePath ?? ''), // Exporting the image path
       ]);
     }
@@ -157,7 +156,7 @@ class ExportService {
     }
     excel.delete('Sheet1');
 
-    var filePath = '${selectedDirectory}/darta_chalani_export.xlsx';
+    var filePath = '$selectedDirectory/darta_chalani_export.xlsx';
     var fileBytes = excel.save();
     if (fileBytes == null) return;
 
