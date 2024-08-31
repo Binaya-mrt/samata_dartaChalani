@@ -57,7 +57,9 @@ class MyApp extends StatelessWidget {
               fontWeight: FontWeight.w600,
               color: Color(0xff108841)),
           headlineSmall: TextStyle(
-              fontSize: 24, fontWeight: FontWeight.w600, color: Colors.black),
+              fontSize: 20,
+              fontWeight: FontWeight.w600,
+              color: Color(0xff108841)),
           bodyLarge: TextStyle(
               fontSize: 18, fontWeight: FontWeight.w500, color: Colors.black),
           labelLarge: TextStyle(
@@ -274,146 +276,148 @@ class _SignupPageState extends State<SignupPage> {
         backgroundColor: Colors.white,
         body: Align(
           alignment: Alignment.topCenter,
-          child: Column(
-            children: [
-              const Tauko(
-                header: '',
-              ),
-              Container(
-                width: getwidth(context) / 3,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: const Color(0xff108841)),
+          child: SingleChildScrollView(
+            child: Column(
+              children: [
+                const Tauko(
+                  header: '',
                 ),
-                child: Form(
-                  key: _formKey,
-                  child: Padding(
-                    padding: const EdgeInsets.all(24.0),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Center(
-                          child: Text('SignUp Page',
-                              style: gettext(context).headlineSmall),
-                        ),
-                        SizedBox(height: getheight(context) * 0.02),
-                        Text('User:', style: gettext(context).bodyLarge),
-                        TextFormField(
-                          controller: usernameController,
-                          cursorColor: const Color(0xffBFBABA),
-                          decoration: InputDecoration(
-                            enabledBorder: border,
-                            focusedBorder: border,
-                            hintText: 'Username',
-                            hintStyle: gettext(context).labelLarge,
+                Container(
+                  width: getwidth(context) / 3,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: const Color(0xff108841)),
+                  ),
+                  child: Form(
+                    key: _formKey,
+                    child: Padding(
+                      padding: const EdgeInsets.all(24.0),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Center(
+                            child: Text('SignUp Page',
+                                style: gettext(context).headlineSmall),
                           ),
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'Please enter your username';
-                            }
-                            return null;
-                          },
-                        ),
-                        SizedBox(height: getheight(context) * 0.02),
-                        Text('Password:', style: gettext(context).bodyLarge),
-                        TextFormField(
-                          controller: passwordController,
-                          obscureText: _isObscure,
-                          cursorColor: const Color(0xffBFBABA),
-                          decoration: InputDecoration(
-                            enabledBorder: border,
-                            focusedBorder: border,
-                            hintText: 'Enter your password',
-                            hintStyle: gettext(context).labelLarge,
-                            suffixIcon: IconButton(
-                              icon: Icon(
-                                _isObscure
-                                    ? Icons.visibility
-                                    : Icons.visibility_off,
+                          SizedBox(height: getheight(context) * 0.02),
+                          Text('User:', style: gettext(context).bodyLarge),
+                          TextFormField(
+                            controller: usernameController,
+                            cursorColor: const Color(0xffBFBABA),
+                            decoration: InputDecoration(
+                              enabledBorder: border,
+                              focusedBorder: border,
+                              hintText: 'Username',
+                              hintStyle: gettext(context).labelLarge,
+                            ),
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Please enter your username';
+                              }
+                              return null;
+                            },
+                          ),
+                          SizedBox(height: getheight(context) * 0.02),
+                          Text('Password:', style: gettext(context).bodyLarge),
+                          TextFormField(
+                            controller: passwordController,
+                            obscureText: _isObscure,
+                            cursorColor: const Color(0xffBFBABA),
+                            decoration: InputDecoration(
+                              enabledBorder: border,
+                              focusedBorder: border,
+                              hintText: 'Enter your password',
+                              hintStyle: gettext(context).labelLarge,
+                              suffixIcon: IconButton(
+                                icon: Icon(
+                                  _isObscure
+                                      ? Icons.visibility
+                                      : Icons.visibility_off,
+                                ),
+                                onPressed: () {
+                                  setState(() {
+                                    _isObscure = !_isObscure;
+                                  });
+                                },
                               ),
-                              onPressed: () {
-                                setState(() {
-                                  _isObscure = !_isObscure;
-                                });
-                              },
                             ),
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Please enter your password';
+                              }
+                              return null;
+                            },
                           ),
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'Please enter your password';
-                            }
-                            return null;
-                          },
-                        ),
-                        SizedBox(height: getheight(context) * 0.02),
-                        Text('Confirm Password:',
-                            style: gettext(context).bodyLarge),
-                        TextFormField(
-                          controller: confirmPasswordController,
-                          obscureText: _isObscure,
-                          cursorColor: const Color(0xffBFBABA),
-                          decoration: InputDecoration(
-                            enabledBorder: border,
-                            focusedBorder: border,
-                            hintText: 'Rewrite to confirm your password',
-                            hintStyle: gettext(context).labelLarge,
-                            suffixIcon: IconButton(
-                              icon: Icon(
-                                _isObscure
-                                    ? Icons.visibility
-                                    : Icons.visibility_off,
+                          SizedBox(height: getheight(context) * 0.02),
+                          Text('Confirm Password:',
+                              style: gettext(context).bodyLarge),
+                          TextFormField(
+                            controller: confirmPasswordController,
+                            obscureText: _isObscure,
+                            cursorColor: const Color(0xffBFBABA),
+                            decoration: InputDecoration(
+                              enabledBorder: border,
+                              focusedBorder: border,
+                              hintText: 'Rewrite to confirm your password',
+                              hintStyle: gettext(context).labelLarge,
+                              suffixIcon: IconButton(
+                                icon: Icon(
+                                  _isObscure
+                                      ? Icons.visibility
+                                      : Icons.visibility_off,
+                                ),
+                                onPressed: () {
+                                  setState(() {
+                                    _isObscure = !_isObscure;
+                                  });
+                                },
                               ),
-                              onPressed: () {
-                                setState(() {
-                                  _isObscure = !_isObscure;
-                                });
-                              },
+                            ),
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Please confirm your password';
+                              }
+                              if (value != passwordController.text) {
+                                return 'Passwords do not match';
+                              }
+                              return null;
+                            },
+                          ),
+                          SizedBox(height: getheight(context) * 0.04),
+                          GestureDetector(
+                            onTap: () {
+                              if (_formKey.currentState?.validate() ?? false) {
+                                _register(usernameController.text.trim(),
+                                    passwordController.text.trim());
+                              }
+                            },
+                            child: Container(
+                              height: getheight(context) * 0.05,
+                              width: double.infinity,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(12),
+                                color: const Color(0xff108841),
+                              ),
+                              child: Center(
+                                child: Text('Sign Up',
+                                    style: gettext(context).titleMedium),
+                              ),
                             ),
                           ),
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'Please confirm your password';
-                            }
-                            if (value != passwordController.text) {
-                              return 'Passwords do not match';
-                            }
-                            return null;
-                          },
-                        ),
-                        SizedBox(height: getheight(context) * 0.04),
-                        GestureDetector(
-                          onTap: () {
-                            if (_formKey.currentState?.validate() ?? false) {
-                              _register(usernameController.text.trim(),
-                                  passwordController.text.trim());
-                            }
-                          },
-                          child: Container(
-                            height: getheight(context) * 0.05,
-                            width: double.infinity,
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(12),
-                              color: const Color(0xff108841),
-                            ),
-                            child: Center(
-                              child: Text('Sign Up',
-                                  style: gettext(context).titleMedium),
-                            ),
-                          ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
                 ),
-              ),
-              TextButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-                child: const Text('Already Registered?, Login'),
-              ),
-            ],
+                TextButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  child: const Text('Already Registered?, Login'),
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -447,29 +451,18 @@ class HomePage extends StatelessWidget {
     return Scaffold(
       backgroundColor: Colors.white,
       body: Align(
-        alignment: Alignment.topCenter,
+        alignment: Alignment.center,
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: <Widget>[
             SizedBox(height: getheight(context) * 0.04),
+            const Tauko(
+              header: 'Darta-Chalani Portal',
+            ),
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                ElevatedButton(
-                  onPressed: () {
-                    Navigator.push(context,
-                        MaterialPageRoute(builder: (context) {
-                      return const ViewAllScreen();
-                    }));
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xff108841),
-                    minimumSize: const Size(200, 50),
-                  ),
-                  child: Text('View All Darta Chalanis',
-                      style: gettext(context).titleMedium),
-                ),
                 ElevatedButton(
                   onPressed: () {
                     Navigator.push(context,
@@ -478,13 +471,17 @@ class HomePage extends StatelessWidget {
                     }));
                   },
                   style: ElevatedButton.styleFrom(
+                    // make it sqaure
+
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(0.0),
+                    ),
                     backgroundColor: const Color(0xff108841),
                     minimumSize: const Size(200, 50),
                   ),
-                  child:
-                      Text('Create Darta', style: gettext(context).titleMedium),
+                  child: Text('Darta', style: gettext(context).titleMedium),
                 ),
-                SizedBox(height: getheight(context) * 0.04),
+                SizedBox(width: getwidth(context) * 0.04),
                 ElevatedButton(
                   onPressed: () {
                     Navigator.push(
@@ -495,32 +492,52 @@ class HomePage extends StatelessWidget {
                     );
                   },
                   style: ElevatedButton.styleFrom(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(0.0),
+                    ),
                     backgroundColor: const Color(0xff108841),
                     minimumSize: const Size(200, 50),
                   ),
-                  child: Text('Create Chalani',
-                      style: gettext(context).titleMedium),
+                  child: Text('Chalani', style: gettext(context).titleMedium),
+                ),
+                SizedBox(width: getwidth(context) * 0.04),
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.push(context,
+                        MaterialPageRoute(builder: (context) {
+                      return const ViewAllScreen();
+                    }));
+                  },
+                  style: ElevatedButton.styleFrom(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(0.0),
+                    ),
+                    backgroundColor: const Color(0xff108841),
+                    minimumSize: const Size(200, 50),
+                  ),
+                  child:
+                      Text('View Reports', style: gettext(context).titleMedium),
                 ),
               ],
             ),
-            const Tauko(
-              header: 'Darta-Chalani Portal',
-            ),
+            SizedBox(height: getheight(context) * 0.04),
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 ElevatedButton(
                   onPressed: () async {
                     await HiveExportImport.exportData(context);
                   },
                   style: ElevatedButton.styleFrom(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(0.0),
+                    ),
                     backgroundColor: const Color(0xff108841),
                     minimumSize: const Size(200, 50),
                   ),
-                  child: Text('Export Database',
-                      style: gettext(context).titleMedium),
+                  child: Text('Export', style: gettext(context).titleMedium),
                 ),
-                SizedBox(height: getheight(context) * 0.04),
+                SizedBox(width: getwidth(context) * 0.04),
                 ElevatedButton(
                   onPressed: () {
                     HiveExportImport.importData(context);
@@ -528,24 +545,37 @@ class HomePage extends StatelessWidget {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xff108841),
                     minimumSize: const Size(200, 50),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(0.0),
+                    ),
                   ),
-                  child: Text('Import Database',
-                      style: gettext(context).titleMedium),
+                  child: Text('Import', style: gettext(context).titleMedium),
                 ),
-                SizedBox(height: getheight(context) * 0.04),
+                SizedBox(width: getwidth(context) * 0.04),
                 // const Spacer(),
                 ElevatedButton(
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.red,
                     minimumSize: const Size(200, 50),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(0.0),
+                    ),
                   ),
                   child: const Text('Logout',
-                      style: TextStyle(color: Colors.white)),
+                      style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w600,
+                          fontSize: 18)),
                   onPressed: () {
                     _logout(context);
                   },
                 ),
               ],
+            ),
+            Spacer(),
+            Text(
+              '2024 © Samata',
+              style: TextStyle(fontWeight: FontWeight.w500),
             ),
             SizedBox(height: getheight(context) * 0.04),
             SizedBox(height: getheight(context) * 0.04),

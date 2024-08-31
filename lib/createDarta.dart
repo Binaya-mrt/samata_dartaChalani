@@ -108,6 +108,9 @@ class _CreateDartaScreenState extends State<CreateDartaScreen> {
         );
 
         Navigator.of(context).pop();
+        Navigator.push(context, MaterialPageRoute(builder: (context) {
+          return CreateDartaScreen();
+        }));
       } catch (e) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Failed to save Darta: $e')),

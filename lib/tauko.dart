@@ -12,15 +12,19 @@ class Tauko extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
+      mainAxisAlignment: MainAxisAlignment.start,
+      // crossAxisAlignment: CrossA,
       children: [
         SizedBox(
             height: MediaQuery.of(context).size.height * 0.1,
             child: Image.asset('assets/images/logotp.png')),
-        Text('Samata Gharelu Laghubitta',
-            style: gettext(context).headlineMedium),
+        Text('Samata Gharelu Laghubitta Bittiya Sanstha Ltd.',
+            style: gettext(context).headlineSmall),
+        Text('Banepa -07, Kavre, Nepal', style: gettext(context).bodySmall),
+        Text('Tel: 011-597000', style: gettext(context).bodySmall),
+        SizedBox(height: getheight(context) * 0.04),
         Text(header, style: gettext(context).headlineLarge),
-        SizedBox(height: getheight(context) * 0.02),
+        SizedBox(height: getheight(context) * 0.06),
       ],
     );
   }

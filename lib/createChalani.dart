@@ -113,7 +113,11 @@ class _CreateChalaniScreenState extends State<CreateChalaniScreen> {
           const SnackBar(content: Text('Chalani Created Successfully')),
         );
 
+        // Navigator.of(context).pop();
         Navigator.of(context).pop();
+        Navigator.push(context, MaterialPageRoute(builder: (context) {
+          return CreateChalaniScreen();
+        }));
       } catch (e) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
