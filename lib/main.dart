@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:samata_dartachalani/constants.dart';
 import 'package:samata_dartachalani/createChalani.dart';
 import 'package:samata_dartachalani/createDarta.dart';
@@ -13,25 +14,45 @@ import 'package:samata_dartachalani/models/darta.dart';
 import 'package:samata_dartachalani/models/user.dart';
 import 'package:samata_dartachalani/tauko.dart';
 import 'package:samata_dartachalani/viewAllDartaChalani.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-void main() async {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  // Directory appDocumentDir;
-  String? selectedDirectory = await FilePicker.platform.getDirectoryPath();
-  if (selectedDirectory == null) {
-    // User canceled the picker
-    return;
+
+  // Initialize SharedPreferences
+  final prefs = await SharedPreferences.getInstance();
+
+  // Try to get the stored directory path
+  String? storedDirectory = prefs.getString('hive_directory');
+
+  if (storedDirectory == null) {
+    // If no stored directory, ask the user to select one
+    storedDirectory = await FilePicker.platform.getDirectoryPath();
+
+    if (storedDirectory == null) {
+      // User canceled the picker, use the default app documents directory
+      final appDocDir = await getApplicationDocumentsDirectory();
+      storedDirectory = appDocDir.path;
+    }
+
+    // Store the selected directory for future use
+    await prefs.setString('hive_directory', storedDirectory);
   }
 
-  Hive.init(selectedDirectory);
+  // Initialize Hive with the stored or selected directory
+  Hive.init(storedDirectory);
+
+  // Register adapters
   Hive.registerAdapter(UserAdapter());
   Hive.registerAdapter(DartaAdapter());
   Hive.registerAdapter(ChalaniAdapter());
 
+  // Open Hive boxes
   await Hive.openBox('settings');
   await Hive.openBox<Darta>('darta');
   await Hive.openBox<Chalani>('chalani');
   await Hive.openBox<User>('users');
+
   runApp(const MyApp());
 }
 

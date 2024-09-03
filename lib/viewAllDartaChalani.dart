@@ -45,7 +45,7 @@ class _ViewAllScreenState extends State<ViewAllScreen> {
             title: const Text('Darta Chalani Records',
                 style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
             bottom: const TabBar(
-              tabs: [Tab(text: 'Darta'), Tab(text: 'Chalani')],
+              tabs: [Tab(text: 'Chalani'), Tab(text: 'Darta')],
               indicatorColor: Color(0xff108841),
               labelColor: Color(0xff108841),
               dividerHeight: 0,
@@ -68,8 +68,8 @@ class _ViewAllScreenState extends State<ViewAllScreen> {
           ),
           body: TabBarView(
             children: [
-              _buildDataTab(filteredDartaList, isDarta: true),
               _buildDataTab(filteredChalaniList, isDarta: false),
+              _buildDataTab(filteredDartaList, isDarta: true),
             ],
           ),
         ),
@@ -104,6 +104,7 @@ class _ViewAllScreenState extends State<ViewAllScreen> {
         Padding(
           padding: const EdgeInsets.all(16.0),
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               TextField(
                 decoration: InputDecoration(
@@ -123,6 +124,14 @@ class _ViewAllScreenState extends State<ViewAllScreen> {
                 },
               ),
               const SizedBox(height: 16),
+              Text('Select Date Range',
+                  style: TextStyle(
+                      color: Colors.black,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600)),
+              SizedBox(
+                height: 10,
+              ),
               Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
